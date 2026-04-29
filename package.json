@@ -1,0 +1,32 @@
+{
+  "name": "drupal_ai_helper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bovverCode/drupal_ai_helper.git"
+  },
+  "keywords": [
+    "drupal",
+    "ai"
+  ],
+  "author": "Denys Sobkevych",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bovverCode/drupal_ai_helper/issues"
+  },
+  "homepage": "https://github.com/bovverCode/drupal_ai_helper#readme",
+  "dependencies": {
+    "commander": "^14.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}
