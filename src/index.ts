@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import  { Command } from "commander";
 import { readdir } from "node:fs/promises";
 
@@ -10,7 +11,6 @@ program
     .action(async () => {
         try {
             const files: string[] = await readdir(process.cwd());
-
             files.forEach(file => {
                 console.log(file);
             })
