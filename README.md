@@ -4,10 +4,12 @@
 2. Run `npm install`
 3. Run `npm run build`
 4. Do `chmod +x dist/index.js`
+5. Run `npm link`
 #### After that you can run `druppy <command>` in the terminal everywhere.
 
 ### Remaining tasks:
 - [x] Do standalone cli application
+- [X] Question - answer (AI)
 - [ ] Create a service in the current directory by name
 - [ ] Writing update (analyze yesterday work) commits by my name, ask additional info (use pattern)
 - [ ] Analysis of changes in the current branch or specified one
@@ -22,3 +24,7 @@
 - [ ] Analyze and fix container problems (ddev)
 - [ ] Introspection of functionality by keywords (agent)?
   - [ ] Give pointer links to IDE in the response to files (PHPstorm plugin?)
+
+### Commands:
+- `druppy list` - list current folder's files
+- `druppy -m <message>` - send a message to the AI
