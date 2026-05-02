@@ -1,11 +1,16 @@
 #!/usr/bin/env node
-import  { Command, OptionValues } from "commander";
-import { readdir } from "node:fs/promises";
-import { GoogleGenAI } from "@google/genai";
-import "dotenv/config";
+import { Command } from 'commander';
+import { readdir } from 'node:fs/promises';
+import { GoogleGenAI } from '@google/genai';
+import 'dotenv/config';
+
+// Init types.
+type ChatMessage = { message: string };
 
 // Init Gemini API.
-const ai: GoogleGenAI = new GoogleGenAI({});
+const apiKey: string = getEnvVar('GEMINI_API_KEY');
+const model: string = getEnvVar('GEMINI_MODEL');
+const ai: GoogleGenAI = new GoogleGenAI({ apiKey });
 
 // Init cli app.
 const program: Command = new Command();
@@ -18,7 +23,7 @@ program
 program
     .command('chat')
     .option('-m, --message <message>', 'Ask a question', 'Say hello with random language')
-    .action((options: OptionValues) => chat(options.message || ''));
+    .action((options: ChatMessage) => chat(options.message));
 program.parse();
 
 /**
@@ -27,7 +32,7 @@ program.parse();
 async function listFolder(): Promise<void> {
     try {
         const files: string[] = await readdir(process.cwd());
-        files.forEach(file => {
+        files.forEach(file=> {
             console.log(file);
         })
     } catch (error) {
@@ -40,15 +45,26 @@ async function listFolder(): Promise<void> {
  * @param message - The message to send to Gemini API.
  */
 async function chat(message: string): Promise<void> {
-    if (!message) console.log("No message provided");
+    if (!message) console.log('No message provided');
     console.log(`Sending message: ${message}`);
     try {
         const response = await ai.models.generateContent({
-            model: process.env.GEMINI_MODEL || '',
+            model,
             contents: message
         });
         console.log(response.text);
     } catch (error) {
         console.error(error);
     }
+}
+
+/**
+ * Get an environment variable.
+ * @param name - The name of the environment variable.
+ * @returns The value of the environment variable.
+ */
+function getEnvVar(name: string): string {
+    const value: string | undefined = process.env[name];
+    if (!value) throw new Error(`Environment variable ${name} is not defined`);
+    return value;
 }
