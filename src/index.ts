@@ -5,6 +5,7 @@ import { GoogleGenAI } from '@google/genai';
 import 'dotenv/config';
 
 // Init types.
+type FolderPath = { path: string };
 type ChatMessage = { message: string };
 
 // Init Gemini API.
@@ -14,24 +15,32 @@ const ai: GoogleGenAI = new GoogleGenAI({ apiKey });
 
 // Init cli app.
 const program: Command = new Command();
-program.name('druppy');
-// List command.
+program
+    .name('druppy')
+    .usage('<command> [options]');
+
 program
     .command('list')
-    .action(listFolder);
-// AI chat command.
+    .helpCommand('list -p <path>')
+    .description('List files in a folder')
+    .option('-p, --path <path>', 'Absolute path to the folder', process.cwd())
+    .action((options: FolderPath) => listFolder(options.path));
+
 program
     .command('chat')
+    .description('Ask a question to Gemini API')
     .option('-m, --message <message>', 'Ask a question', 'Say hello with random language')
     .action((options: ChatMessage) => chat(options.message));
+
 program.parse();
 
 /**
  * List current folder.
+ * @param path - Path to folder to list.
  */
-async function listFolder(): Promise<void> {
+async function listFolder(path: string): Promise<void> {
     try {
-        const files: string[] = await readdir(process.cwd());
+        const files: string[] = await readdir(path);
         files.forEach(file=> {
             console.log(file);
         })
