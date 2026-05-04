@@ -18,7 +18,9 @@
 - [ ] Do PR review (compare the branch with the master)
 - [ ] Analysis of a new task and recommendations
 - [ ] Add files to gitignore (.git directory)
-- [ ] find module/file related to some phrase, file name etc
+- [ ] Find module/file related to some phrase, file name etc
+- [ ] Do Drupal update script, send a message to the AI in case of error
+- [ ] Do git commit and push feature (get branch, do commit and push by pattern)
 
 ### Additional:
 - [ ] Analyze and fix container problems (ddev)
