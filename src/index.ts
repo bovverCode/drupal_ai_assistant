@@ -3,12 +3,12 @@ import { Command } from 'commander';
 import { readdir } from 'node:fs/promises';
 import { GoogleGenAI } from '@google/genai';
 import * as config from 'dotenv';
-import path_service from 'node:path';
+import path from 'node:path';
 
 // Configure dotenv.
 config.config({
-    path: path_service.resolve(__dirname, '../.env'),
-})
+    path: path.resolve(__dirname, '../.env'),
+});
 
 // Init types.
 type FolderPath = { path: string };
@@ -47,9 +47,9 @@ program.parse();
 async function listFolder(path: string): Promise<void> {
     try {
         const files: string[] = await readdir(path);
-        files.forEach(file=> {
+        files.forEach(file => {
             console.log(file);
-        })
+        });
     } catch (error) {
         console.error(error);
     }
@@ -60,7 +60,10 @@ async function listFolder(path: string): Promise<void> {
  * @param message - The message to send to Gemini API.
  */
 async function chat(message: string): Promise<void> {
-    if (!message) console.log('No message provided');
+    if (!message) {
+        console.log('No message provided');
+        return;
+    }
     console.log(`Sending message: ${message}`);
     try {
         const response = await ai.models.generateContent({
