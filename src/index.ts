@@ -2,7 +2,13 @@
 import { Command } from 'commander';
 import { readdir } from 'node:fs/promises';
 import { GoogleGenAI } from '@google/genai';
-import 'dotenv/config';
+import * as config from 'dotenv';
+import path_service from 'node:path';
+
+// Configure dotenv.
+config.config({
+    path: path_service.resolve(__dirname, '../.env'),
+})
 
 // Init types.
 type FolderPath = { path: string };
