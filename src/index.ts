@@ -27,19 +27,19 @@ program
 program
     .command('list')
     .helpCommand('list -p <path>')
-    .description('List files in a folder')
+    .description('list files in a folder')
     .argument('[path]', 'Absolute path to the folder', process.cwd())
     .action((path: string) => listFolder(path));
 
 program
     .command('chat')
-    .description('Ask a question to Gemini API')
+    .description('ask a question to Gemini API')
     .argument('[message]', 'Message to send to Gemini API', 'Say hello with random language')
     .action((message: string) => chat(message));
 
 program
     .command('ci')
-    .description('Cache context to Gemini API')
+    .description('cache context to Gemini API')
     .argument('[message]', 'Message to cache')
     .action((message: string) => console.log(message))
 program.parse();
