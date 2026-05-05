@@ -29,4 +29,4 @@
 
 ### Commands:
 - `druppy list <path>` - list current folder's files
-- `druppy <message>` - send a message to the AI
+- `druppy chat <message>` - send a message to the AI
