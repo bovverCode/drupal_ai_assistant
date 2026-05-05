@@ -11,7 +11,6 @@ config.config({
 });
 
 // Init types.
-type FolderPath = { path: string };
 type ChatMessage = { message: string };
 
 // Init Gemini API.
@@ -29,15 +28,20 @@ program
     .command('list')
     .helpCommand('list -p <path>')
     .description('List files in a folder')
-    .option('-p, --path <path>', 'Absolute path to the folder', process.cwd())
-    .action((options: FolderPath) => listFolder(options.path));
+    .argument('[path]', 'Absolute path to the folder', process.cwd())
+    .action((path: string) => listFolder(path));
 
 program
     .command('chat')
     .description('Ask a question to Gemini API')
-    .option('-m, --message <message>', 'Ask a question', 'Say hello with random language')
-    .action((options: ChatMessage) => chat(options.message));
+    .argument('[message]', 'Message to send to Gemini API', 'Say hello with random language')
+    .action((message: string) => chat(message));
 
+program
+    .command('ci')
+    .description('Cache context to Gemini API')
+    .argument('[message]', 'Message to cache')
+    .action((message: string) => console.log(message))
 program.parse();
 
 /**
