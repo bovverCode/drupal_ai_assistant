@@ -1,7 +1,13 @@
 #!/usr/bin/env node
-import { Command } from 'commander';
+import {Command, OptionValues} from 'commander';
 import { readdir } from 'node:fs/promises';
-import { GoogleGenAI } from '@google/genai';
+import {
+    GoogleGenAI,
+    createUserContent,
+    CachedContent,
+    GenerateContentResponse,
+    Pager
+} from '@google/genai';
 import * as config from 'dotenv';
 import path from 'node:path';
 
@@ -9,9 +15,6 @@ import path from 'node:path';
 config.config({
     path: path.resolve(__dirname, '../.env'),
 });
-
-// Init types.
-type ChatMessage = { message: string };
 
 // Init Gemini API.
 const apiKey: string = getEnvVar('GEMINI_API_KEY');
@@ -25,23 +28,18 @@ program
     .usage('<command> [options]');
 
 program
-    .command('list')
-    .helpCommand('list -p <path>')
-    .description('list files in a folder')
-    .argument('[path]', 'Absolute path to the folder', process.cwd())
-    .action((path: string) => listFolder(path));
-
-program
     .command('chat')
     .description('ask a question to Gemini API')
     .argument('[message]', 'Message to send to Gemini API', 'Say hello with random language')
     .action((message: string) => chat(message));
 
+// Training commands.
 program
-    .command('ci')
-    .description('cache context to Gemini API')
-    .argument('[message]', 'Message to cache')
-    .action((message: string) => console.log(message))
+    .command('list')
+    .description('list files in a folder')
+    .argument('[path]', 'Absolute path to the folder', process.cwd())
+    .action((path: string) => listFolder(path));
+
 program.parse();
 
 /**
@@ -70,7 +68,7 @@ async function chat(message: string): Promise<void> {
     }
     console.log(`Sending message: ${message}`);
     try {
-        const response = await ai.models.generateContent({
+        const response: GenerateContentResponse = await ai.models.generateContent({
             model,
             contents: message
         });

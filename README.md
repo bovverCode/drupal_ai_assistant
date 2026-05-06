@@ -28,5 +28,4 @@
   - [ ] Give pointer links to IDE in the response to files (PHPstorm plugin?)
 
 ### Commands:
-- `druppy list <path>` - list current folder's files
 - `druppy chat <message>` - send a message to the AI
