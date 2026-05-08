@@ -1,9 +1,13 @@
 /**
  * `service` command — generate a Drupal service scaffold inside a module folder.
  */
-import { Command, OptionValues } from "commander";
-import { FileSystemService } from "@/service/FileSystemService";
-import path from "node:path";
+import { Command, OptionValues } from 'commander';
+import { FileSystemService } from '@/service/FileSystemService';
+import path from 'node:path';
+import { geminiService } from '@/service/gemini';
+import yamlParser from 'yaml';
+import { PromptInterface } from '@/prompt/PromptInterface';
+import { readFile } from 'node:fs/promises';
 
 /**
  * The maximum depth of the Drupal module info file directory lookup.
@@ -36,7 +40,15 @@ export function registerCommand(program: Command): void {
 async function createService(serviceInfo: string, lookupPath: string): Promise<void> {
     lookupPath = path.join(process.cwd(), lookupPath);
     const modulePath: string = await getModulePath(lookupPath, maxDepth);
-    console.log(`Module path: ${modulePath}`);
+
+    const promptConfig: PromptInterface = await getPromptConfig();
+    const message = promptConfig.message.replace('${user_input}', serviceInfo);
+    const response: string = await geminiService.sendMessage(message, {
+        systemInstruction: promptConfig.instruction,
+        temperature: 0,
+        stopSequences: ["\n"]
+    });
+    console.log(response);
 }
 
 /**
@@ -56,4 +68,13 @@ async function getModulePath(lookupPath: string, retry: number): Promise<string>
         }
         throw new Error('Could not find Drupal module directory');
     }
+}
+
+/**
+ * Get the command prompt configuration.
+ * @returns Prompt configuration object.
+ */
+async function getPromptConfig(): Promise<PromptInterface> {
+    const promptFileContent: string = await readFile(path.join(__dirname, '../prompt/service.yml'), 'utf-8');
+    return yamlParser.parse(promptFileContent);
 }

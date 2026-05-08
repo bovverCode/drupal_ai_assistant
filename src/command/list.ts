@@ -1,8 +1,8 @@
 /**
  * `list` command — print the contents of a given directory.
  */
-import { Command } from "commander";
-import { FileSystemService } from "@/service/FileSystemService";
+import { Command } from 'commander';
+import { FileSystemService } from '@/service/FileSystemService';
 
 /**
  * Register the `list` command.

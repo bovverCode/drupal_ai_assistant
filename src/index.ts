@@ -3,7 +3,7 @@
  * Entry point for the `druppy` CLI.
  */
 import { Command } from 'commander';
-import { registerCommands } from "@/functions";
+import { registerCommands } from '@/functions';
 import * as config from 'dotenv';
 import path from 'node:path';
 

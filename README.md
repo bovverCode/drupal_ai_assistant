@@ -3,8 +3,6 @@
 1. Clone repository
 2. Run `npm install`
 3. Run `npm run build`
-4. Do `chmod +x dist/index.js`
-5. Run `npm link`
 #### After that you can run `druppy <command>` in the terminal everywhere.
 
 ### Remaining tasks:

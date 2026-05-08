@@ -1,8 +1,8 @@
 /**
  * `chat` command — send a free-text message to Gemini API and print the response.
  */
-import { Command } from "commander";
-import  { geminiService } from "@/service/gemini"
+import { Command } from 'commander';
+import  { geminiService } from '@/service/gemini'
 
 /**
  * Register the `chat` command.
