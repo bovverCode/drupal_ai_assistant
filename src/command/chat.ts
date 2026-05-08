@@ -14,5 +14,9 @@ export function registerCommand(program: Command): void {
         .command('chat')
         .description('ask a question to Gemini API')
         .argument('[message]', 'Message to send to Gemini API', 'Say hello with random language')
-        .action(async (message: string) => console.log(await geminiService.sendMessage(message)));
+        .action((message: string) => {
+            geminiService.sendMessage(message)
+                .then(response => console.log(response))
+                .catch(error => program.error(error instanceof Error ? error.message : String(error)))
+        });
 }

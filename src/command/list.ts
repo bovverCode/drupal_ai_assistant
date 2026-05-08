@@ -2,7 +2,7 @@
  * `list` command — print the contents of a given directory.
  */
 import { Command } from "commander";
-import { listFolder } from "@/functions";
+import { FileSystemService } from "@/service/FileSystemService";
 
 /**
  * Register the `list` command.
@@ -14,7 +14,10 @@ export function registerCommand(program: Command): void {
         .command('list')
         .description('list files in a folder')
         .argument('[path]', 'Absolute path to the folder', process.cwd())
-        .action((path: string) => list(path));
+        .action((path: string) => {
+            list(path)
+                .catch(error => program.error(error instanceof Error ? error.message : String(error)))
+        });
 }
 
 /**
@@ -22,13 +25,9 @@ export function registerCommand(program: Command): void {
  * @param path - Path to folder to list.
  */
 async function list(path: string): Promise<void> {
-    try {
-        const files: string[] = await listFolder(path);
-        files.forEach(file => {
-            console.log(file);
-        });
-    } catch (error) {
-        throw new Error('Error reading directory: ' + error)
-    }
+    const files: string[] = await FileSystemService.listFolder(path);
+    files.forEach(file => {
+        console.log(file);
+    });
 }
 

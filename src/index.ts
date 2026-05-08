@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
  * Entry point for the `druppy` CLI.
- * Bootstraps environment config, initializes Gemini API, and registers all commands.
  */
 import { Command } from 'commander';
 import { registerCommands } from "@/functions";
@@ -12,7 +11,6 @@ import path from 'node:path';
 config.config({
     path: path.resolve(__dirname, '../.env'),
 });
-
 
 // Init cli app.
 const program: Command = new Command();
