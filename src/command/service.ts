@@ -44,9 +44,12 @@ export function registerCommand(program: Command): void {
 async function createService(serviceInfo: string, lookupPath: string): Promise<void> {
     lookupPath = path.join(process.cwd(), lookupPath);
     const modulePath: string = await getModulePath(lookupPath, maxDepth);
-    const serviceData: ServiceData = await generateServiceData(serviceInfo);
+    let serviceData: ServiceData = await generateServiceData(serviceInfo);
     console.log(serviceData);
-    await confirm({message: 'Are you fine with naming?'});
+    while (!await confirm({message: 'Are you fine with naming?'})) {
+        serviceData = await generateServiceData(serviceInfo);
+        console.log(serviceData);
+    }
 }
 
 /**
