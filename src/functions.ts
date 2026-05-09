@@ -3,7 +3,10 @@
  */
 import { Command } from 'commander';
 import path from 'node:path';
-import { FileSystemService } from '@/service/FileSystemService';
+import { FileSystemService } from '@/service/FileSystemService.js';
+import { fileURLToPath } from 'node:url';
+
+export const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Get an environment variable.

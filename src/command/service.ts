@@ -2,12 +2,14 @@
  * `service` command — generate a Drupal service scaffold inside a module folder.
  */
 import { Command, OptionValues } from 'commander';
-import { FileSystemService } from '@/service/FileSystemService';
+import { FileSystemService } from '@/service/FileSystemService.js';
 import path from 'node:path';
-import { geminiService } from '@/service/gemini';
+import { geminiService } from '@/service/gemini.js';
 import yamlParser from 'yaml';
-import { PromptInterface } from '@/prompt/PromptInterface';
+import { PromptInterface } from '@/prompt/PromptInterface.js';
 import { readFile } from 'node:fs/promises';
+import { confirm } from '@inquirer/prompts';
+import { __dirname } from '@/functions.js';
 
 /**
  * The maximum depth of the Drupal module info file directory lookup.
@@ -20,6 +22,8 @@ const maxDepth: number = 7;
  * @param program - The Commander instance to attach the command to.
  */
 export function registerCommand(program: Command): void {
+    program.commandsGroup()
+
     program
         .command('service')
         .description('generate a Drupal service scaffold')
@@ -40,15 +44,9 @@ export function registerCommand(program: Command): void {
 async function createService(serviceInfo: string, lookupPath: string): Promise<void> {
     lookupPath = path.join(process.cwd(), lookupPath);
     const modulePath: string = await getModulePath(lookupPath, maxDepth);
-
-    const promptConfig: PromptInterface = await getPromptConfig();
-    const message = promptConfig.message.replace('${user_input}', serviceInfo);
-    const response: string = await geminiService.sendMessage(message, {
-        systemInstruction: promptConfig.instruction,
-        temperature: 0,
-        stopSequences: ["\n"]
-    });
-    console.log(response);
+    const serviceData: ServiceData = await generateServiceData(serviceInfo);
+    console.log(serviceData);
+    await confirm({message: 'Are you fine with naming?'});
 }
 
 /**
@@ -75,6 +73,39 @@ async function getModulePath(lookupPath: string, retry: number): Promise<string>
  * @returns Prompt configuration object.
  */
 async function getPromptConfig(): Promise<PromptInterface> {
-    const promptFileContent: string = await readFile(path.join(__dirname, '../prompt/service.yml'), 'utf-8');
+    const promptFileContent: string = await readFile(path.join(__dirname, 'prompt/service.yml'), 'utf-8');
     return yamlParser.parse(promptFileContent);
+}
+
+/**
+ * Define service data retrieved from Gemini API response.
+ */
+interface ServiceData {
+    className: string,
+    description: string,
+    slag: string
+}
+
+/**
+ * Generate service data based on the provided description.
+ * @param serviceInfo - Input description of the service to generate.
+ * @return Service data object.
+ */
+async function generateServiceData(serviceInfo: string): Promise<ServiceData> {
+    const promptConfig: PromptInterface = await getPromptConfig();
+    const message = promptConfig.message.replace('${user_input}', serviceInfo);
+    const response: string = await geminiService.sendMessage(message, {
+        systemInstruction: promptConfig.instruction,
+        temperature: 0,
+        stopSequences: ["\n"]
+    });
+    const [className, description, slag] = response.split('|');
+    if (!className || !description || !slag)  {
+        throw new Error('Invalid response from Gemini API. Please try again.')
+    }
+    return {
+      className,
+      description,
+      slag
+    };
 }

@@ -3,9 +3,10 @@
  * Entry point for the `druppy` CLI.
  */
 import { Command } from 'commander';
-import { registerCommands } from '@/functions';
+import { registerCommands } from '@/functions.ts';
 import * as config from 'dotenv';
 import path from 'node:path';
+import { __dirname } from  '@/functions.ts';
 
 // Configure dotenv.
 config.config({

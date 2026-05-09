@@ -2,7 +2,7 @@
  * `list` command — print the contents of a given directory.
  */
 import { Command } from 'commander';
-import { FileSystemService } from '@/service/FileSystemService';
+import { FileSystemService } from '@/service/FileSystemService.ts';
 
 /**
  * Register the `list` command.

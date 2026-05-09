@@ -1,8 +1,8 @@
 /**
  * Module to access Gemini API wrapper.
  */
-import { GeminiService } from '@/service/GeminiService';
-import { getEnvVar } from '@/functions';
+import { GeminiService } from '@/service/GeminiService.ts';
+import { getEnvVar } from '@/functions.ts';
 
 // Init Gemini API.
 const apiKey: string = getEnvVar('GEMINI_API_KEY');

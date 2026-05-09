@@ -1,4 +1,4 @@
-#### The app requires node.js 20.15
+#### The app requires node.js 20.17.0 or higher.
 ### Dev installation:
 1. Clone repository
 2. Run `npm install`

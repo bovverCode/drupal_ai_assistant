@@ -1,8 +1,8 @@
 # IDE
 .idea
 
-# AI
-.codex
+# tsup
+tsup.config.js
 
 # Logs
 logs
