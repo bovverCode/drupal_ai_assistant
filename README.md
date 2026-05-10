@@ -27,3 +27,5 @@
 
 ### Commands:
 - `druppy chat <message>` - send a message to the AI
+- `druppy service <description>` - create a Drupal service, feel free to put any description
+  - `-p` - option to specify the path to the module (by default, it's looking for closest module directory)
