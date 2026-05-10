@@ -8,7 +8,7 @@
 ### Remaining tasks:
 - [x] Do standalone cli application
 - [X] Question - answer (AI)
-- [ ] Create a service in the closest module by name
+- [x] Create a service in the closest module by name
 - [ ] Writing update (analyze yesterday work) commits by my name, ask additional info (use pattern)
 - [ ] Analysis of changes in the current branch or specified one
 - [ ] Analysis of the module
