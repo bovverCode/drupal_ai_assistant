@@ -30,4 +30,3 @@ async function list(path: string): Promise<void> {
         console.log(file);
     });
 }
-

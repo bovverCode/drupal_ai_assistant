@@ -3,8 +3,10 @@
  */
 import { Command } from 'commander';
 import path from 'node:path';
-import { FileSystemService } from '@/service/FileSystemService.js';
+import { FileSystemService } from '@/service/FileSystemService.ts';
 import { fileURLToPath } from 'node:url';
+import {PromptInterface} from "@/prompt/PromptInterface.ts";
+import yamlParser from 'yaml';
 
 export const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
 
@@ -40,4 +42,14 @@ export async function registerCommands(program: Command): Promise<void> {
        const command = await import(path.join(basePath, filename)) as CommandModule;
        command.registerCommand(program);
     }
+}
+
+/**
+ * Get the data prompt yml config.
+ * @param filePath - Path to the prompt yml file.
+ * @returns Prompt configuration object.
+ */
+export async function getPromptConfig(filePath: string): Promise<PromptInterface> {
+    const promptFileContent: string = await FileSystemService.readFile(filePath);
+    return yamlParser.parse(promptFileContent);
 }

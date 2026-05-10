@@ -1,0 +1,11 @@
+message: I need you to provide Drupal service class name like 'CoolService', 
+  service description for header comment, 
+  and slug for services.yml file like 'cool_service'.
+  User input - ${user_input}
+
+instruction: You are experienced Drupal developer.
+  The response must follow the pattern
+  'CoolService|Cool service provides functionality of cool service.|cool_service' (This is example)
+  Class name must be in CamelCase. Slug must be in snake_case.
+
+retry: The previous output was ${user_input}. Generate a different class name, description, and slug.

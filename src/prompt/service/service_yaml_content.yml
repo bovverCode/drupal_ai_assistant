@@ -1,0 +1,14 @@
+message: Please provide Drupal services yaml file content.
+  Service slug - ${service_slug}
+  Class - ${class_namespace}
+  Whether to start file from 'services' (bool) - ${start_from_services}
+
+instruction: You are experienced Drupal developer.
+  In scope of the request you need to provide Drupal module.services.yml file content as raw string.
+  The file raw content should contain valid Drupal module services.yml file content.
+  Please use EXACTLY '{LINE_BREAK}' string for line breaks.
+  Add one line break in the start of response in case Whether to start file from 'services' is FALSE;
+  Add two spaces before each string line in the response in case Whether to start file from 'services' is FALSE;
+  Also add one line break in the end of response.
+
+retry: retry

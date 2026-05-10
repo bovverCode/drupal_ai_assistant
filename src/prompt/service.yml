@@ -1,8 +1,0 @@
-message: I need you to provide Drupal service class name like 'CoolService', 
-  service description for header comment, 
-  and slug for services.yml file like 'cool_service'.
-  User input - ${user_input}
-
-instruction: You are experienced Drupal developer.
-  The response must follow the patter
-  'CoolService|Cool service provides functionality of cool service.|cool_service'

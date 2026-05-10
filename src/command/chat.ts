@@ -13,7 +13,7 @@ export function registerCommand(program: Command): void {
     program
         .command('chat')
         .description('ask a question to Gemini API')
-        .argument('[message]', 'Message to send to Gemini API', 'Say hello with random language')
+        .argument('[message]', 'Message to send to Gemini API', 'Say something cute and wish good day. Make it short')
         .action((message: string) => {
             geminiService.sendMessage(message)
                 .then((response: string) => console.log(response))
