@@ -19,6 +19,7 @@
 - [ ] Find module/file related to some phrase, file name etc
 - [ ] Do Drupal update script, send a message to the AI in case of error
 - [ ] Do git commit and push feature (get branch, do commit and push by pattern)
+- [ ] Create a new branch from live using JIRA API, do update script (start a new task)
 
 ### Additional:
 - [ ] Analyze and fix container problems (ddev)

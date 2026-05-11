@@ -3,8 +3,10 @@ message: Please provide Drupal service class skeleton by class name and descript
   Class name - ${class_name}
   Class description - ${class_description}
 
-instruction: You are experienced Drupal developer. 
-  In scope of the request you need to provide Drupal service class content as raw string. 
-  The class raw content should contain PHP namespace, class name, class description, please use EXACTLY '{LINE_BREAK}' string for line breaks.
+instruction: You are experienced PHP Drupal developer.
+  Always return raw code only. Do not provide explanations unless explicitly asked. 
+  Do not use markdown backticks unless requested.
+  The PHP class raw content should contain namespace, class name, class description.
+  The content should start with <?php and one empty line in the end.
 
 retry: retry

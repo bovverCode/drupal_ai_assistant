@@ -7,7 +7,7 @@ import path from 'node:path';
 import { geminiService } from '@/service/gemini.ts';
 import { PromptInterface } from '@/prompt/PromptInterface.ts';
 import { confirm } from '@inquirer/prompts';
-import { __dirname, getPromptConfig } from '@/functions.ts';
+import { __dirname, getPromptConfig, runExternalCommand } from '@/functions.ts';
 
 /**
  * Define service data retrieved from Gemini API response.
@@ -68,6 +68,15 @@ async function createService(serviceInfo: string, lookupPath: string): Promise<v
 
     const serviceFolderName: string = await createServiceClass(serviceData, modulePath);
     await updateServiceYamlFile(serviceData, modulePath, serviceFolderName);
+
+    if (await confirm({message: 'Should I rebuild cache?'})) {
+        try {
+            console.log(await runExternalCommand('ddev drush cr --verbose'))
+        } catch (error) {
+            const message: string = error instanceof Error ? error.message : String(error);
+            throw new Error('Failed to rebuild cache: ' + message);
+        }
+    }
 }
 
 /**
@@ -159,7 +168,9 @@ async function createServiceClass(serviceData: ServiceData, modulePath: string):
         .replace('${class_description}', serviceData.description);
     const content: string = await geminiService.sendMessage(message, {
         systemInstruction: promptConfig.instruction,
+        temperature: 0.2
     });
+
     await FileSystemService.createOrUpdateFile(
         path.join(modulePath, 'src', serviceFolder, serviceData.className + '.php'),
         content
@@ -181,7 +192,7 @@ async function updateServiceYamlFile(serviceData: ServiceData, modulePath: strin
     // Prepare Gemini API request data.
     const promptConfig: PromptInterface = await getPromptConfig(path.join(promptFolderPath, 'service_yaml_content.yml'));
     const serviceSlug: string = `${moduleSlug}.${serviceData.slug}`;
-    const serviceNameSpace: string = `\\Drupal\\${moduleSlug}\\${serviceFolderName}\\${serviceData.className}`
+    const serviceNameSpace: string = `Drupal\\${moduleSlug}\\${serviceFolderName}\\${serviceData.className}`
     const createServicesYaml: string = await FileSystemService.pathExists(moduleServiceYamlPath) ? 'FALSE' : 'TRUE';
     const message: string = promptConfig.message
         .replace('${service_slug}', serviceSlug)

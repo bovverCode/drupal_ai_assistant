@@ -5,8 +5,8 @@ message: Please provide Drupal services yaml file content.
 
 instruction: You are experienced Drupal developer.
   In scope of the request you need to provide Drupal module.services.yml file content as raw string.
+  Always return raw code only. Do not provide explanations unless explicitly asked. Do not use markdown backticks unless requested.
   The file raw content should contain valid Drupal module services.yml file content.
-  Please use EXACTLY '{LINE_BREAK}' string for line breaks.
   Add one line break in the start of response in case Whether to start file from 'services' is FALSE;
   Add two spaces before each string line in the response in case Whether to start file from 'services' is FALSE;
   Also add one line break in the end of response.

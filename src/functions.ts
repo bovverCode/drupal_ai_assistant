@@ -5,10 +5,14 @@ import { Command } from 'commander';
 import path from 'node:path';
 import { FileSystemService } from '@/service/FileSystemService.ts';
 import { fileURLToPath } from 'node:url';
-import {PromptInterface} from "@/prompt/PromptInterface.ts";
+import {PromptInterface} from '@/prompt/PromptInterface.ts';
 import yamlParser from 'yaml';
+import { exec } from 'child_process';
+import { promisify } from 'node:util';
 
+// Promisify exec function.
 export const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
+const execPromisified = promisify(exec);
 
 /**
  * Get an environment variable.
@@ -52,4 +56,14 @@ export async function registerCommands(program: Command): Promise<void> {
 export async function getPromptConfig(filePath: string): Promise<PromptInterface> {
     const promptFileContent: string = await FileSystemService.readFile(filePath);
     return yamlParser.parse(promptFileContent);
+}
+
+/**
+ * Wrapper to run an external command.
+ * @param command - The command to run.
+ * @returns Output of the command.
+ */
+export async function runExternalCommand(command: string): Promise<string> {
+    const { stdout, stderr } = await execPromisified(command);
+    return stdout || stderr;
 }
