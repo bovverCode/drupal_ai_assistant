@@ -32,33 +32,4 @@
   - `-p` - option to specify the path to the module (by default, it's looking for closest module directory)
 
 ### API configuration:
-- JIRA OK list:
-  - read:issue-adjustments:jira
-  - read:issue-details:jira
-  - read:issue-event:jira
-  - read:issue-field-values:jira
-  - read:issue-link-type:jira
-  - read:issue-link:jira
-  - read:issue-meta:jira
-  - read:issue-security-level:jira
-  - read:issue-security-scheme:jira
-  - read:issue-status:jira
-  - read:issue-type-hierarchy:jira
-  - read:issue-type-scheme:jira
-  - read:issue-type-screen-scheme:jira
-  - read:issue-type-transition:jira
-  - read:issue-type:jira
-  - read:issue-type.property:jira
-  - read:issue-worklog:jira
-  - read:issue-worklog.property:jira
-  - read:issue:jira-software
-  - read:issue:jira
-  - read:issue.changelog:jira
-  - read:issue.property:jira
-  - read:issue.remote-link:jira
-  - read:issue.time-tracking:jira
-  - read:issue.transition:jira
-  - read:issue.vote:jira
-  - read:issue.votes:jira
-  - read:issue.watcher:jira
-  - read:board-scope:jira-software
+- JIRA:
