@@ -2,7 +2,7 @@
  * `chat` command — send a free-text message to Gemini API and print the response.
  */
 import { Command } from 'commander';
-import  { geminiService } from '@/service/gemini.ts';
+import { GeminiClient } from '@/service/GeminiClient.ts';
 
 /**
  * Register the `chat` command.
@@ -15,7 +15,7 @@ export function registerCommand(program: Command): void {
         .description('ask a question to Gemini API')
         .argument('[message]', 'Message to send to Gemini API', 'Say something cute and wish good day. Make it short')
         .action((message: string) => {
-            geminiService.sendMessage(message)
+            GeminiClient.instance.sendMessage(message)
                 .then((response: string) => console.log(response))
                 .catch((error: Error) => program.error(error instanceof Error ? error.message : String(error)))
         });

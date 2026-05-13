@@ -2,7 +2,7 @@
  * `list` command — print the contents of a given directory.
  */
 import { Command } from 'commander';
-import { FileSystemService } from '@/service/FileSystemService.ts';
+import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
 
 /**
  * Register the `list` command.
@@ -25,7 +25,7 @@ export function registerCommand(program: Command): void {
  * @param path - Path to folder to list.
  */
 async function list(path: string): Promise<void> {
-    const files: string[] = await FileSystemService.listFolder(path);
+    const files: string[] = await FileSystemWrapper.listFolder(path);
     files.forEach(file => {
         console.log(file);
     });

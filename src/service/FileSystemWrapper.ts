@@ -1,13 +1,17 @@
 /**
- * Service to interact with the file system.
+ * Wrapper to interact with the file system.
  */
 import { Dirent } from 'node:fs';
 import { promises as fs } from 'fs';
 import path from 'node:path';
-import os from 'node:os';
 
-export class FileSystemService {
+export class FileSystemWrapper {
 
+    /**
+     * Read file by the file path.
+     * @param filePath - Absolute path to the file.
+     * @returns File content as a string.
+     */
     static async readFile(filePath: string): Promise<string> {
         return await fs.readFile(filePath, 'utf-8');
     }
@@ -61,7 +65,7 @@ export class FileSystemService {
     static async createOrUpdateFile(filePath: string, content: string): Promise<void> {
         await fs.appendFile(
             filePath,
-            this.normalizeFileContentFromGemini(content),
+            content,
         );
     }
 
@@ -82,15 +86,6 @@ export class FileSystemService {
         return await fs.access(filePath)
             .then(() => true)
             .catch(() => false);
-    }
-
-    /**
-     * Normalize file content from Gemini API.
-     * @param content - Content to normalize.
-     * @returns Normalized content.
-     */
-    static normalizeFileContentFromGemini(content: string): string {
-        return content.replace(/{LINE_BREAK}/g, os.EOL);
     }
 
 }

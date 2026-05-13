@@ -2,21 +2,14 @@
  * `service` command — generate a Drupal service scaffold inside a module folder.
  */
 import { Command, OptionValues } from 'commander';
-import { FileSystemService } from '@/service/FileSystemService.ts';
+import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
 import path from 'node:path';
-import { geminiService } from '@/service/gemini.ts';
-import { PromptInterface } from '@/prompt/PromptInterface.ts';
+import { GeminiClient } from '@/service/GeminiClient.ts';
+import { PromptInterface } from '@/type/PromptInterface.ts';
 import { confirm } from '@inquirer/prompts';
-import { __dirname, getPromptConfig, runExternalCommand } from '@/functions.ts';
-
-/**
- * Define service data retrieved from Gemini API response.
- */
-interface ServiceData {
-    className: string,
-    description: string,
-    slug: string
-}
+import { __dirname, getPromptConfig } from '@/functions.ts';
+import { CliCommandsWrapper } from '@/service/CliCommandsWrapper.ts';
+import {ServiceData} from "@/type/ServiceData.js";
 
 /**
  * The maximum depth of the Drupal module info file directory lookup.
@@ -71,7 +64,7 @@ async function createService(serviceInfo: string, lookupPath: string): Promise<v
 
     if (await confirm({message: 'Should I rebuild cache?'})) {
         try {
-            console.log(await runExternalCommand('ddev drush cr --verbose'))
+            console.log(await CliCommandsWrapper.runExternalCommand('ddev drush cr --verbose'))
         } catch (error) {
             const message: string = error instanceof Error ? error.message : String(error);
             throw new Error('Failed to rebuild cache: ' + message);
@@ -88,7 +81,7 @@ async function createService(serviceInfo: string, lookupPath: string): Promise<v
 async function getModulePath(lookupPath: string, retry: number): Promise<string> {
     try {
         // Try to find the module info file.
-        await FileSystemService.getFileAbsolutePath(lookupPath, '.+\\.info\\.yml$')
+        await FileSystemWrapper.getFileAbsolutePath(lookupPath, '.+\\.info\\.yml$')
         return lookupPath;
     } catch (error) {
         if (retry > 0) {
@@ -114,7 +107,7 @@ async function generateServiceData(
     const finalMessage = previousData.className ?
         message + ' ' + promptConfig.retry.replace('${user_input}', JSON.stringify(previousData)) :
         message;
-    const response: string = await geminiService.sendMessage(finalMessage, {
+    const response: string = await GeminiClient.instance.sendMessage(finalMessage, {
         systemInstruction: promptConfig.instruction,
         temperature: 0,
         stopSequences: ["\n"]
@@ -144,11 +137,11 @@ async function createServiceClass(serviceData: ServiceData, modulePath: string):
     for (const serviceFolderName of serviceFolderNames) {
         if (!serviceFolderName) {
             // Create services folder in case it doesn't exist.
-            await FileSystemService.createFolder(path.join(modulePath, 'src', serviceFolder));
+            await FileSystemWrapper.createFolder(path.join(modulePath, 'src', serviceFolder));
             break;
         }
         try {
-            files = await FileSystemService.listFolder(path.join(modulePath, 'src', serviceFolderName), ['php']);
+            files = await FileSystemWrapper.listFolder(path.join(modulePath, 'src', serviceFolderName), ['php']);
             serviceFolder = serviceFolderName;
             break;
         } catch {}
@@ -166,12 +159,12 @@ async function createServiceClass(serviceData: ServiceData, modulePath: string):
         .replace('${class_namespace}', namespace)
         .replace('${class_name}', serviceData.className)
         .replace('${class_description}', serviceData.description);
-    const content: string = await geminiService.sendMessage(message, {
+    const content: string = await GeminiClient.instance.sendMessage(message, {
         systemInstruction: promptConfig.instruction,
         temperature: 0.2
     });
 
-    await FileSystemService.createOrUpdateFile(
+    await FileSystemWrapper.createOrUpdateFile(
         path.join(modulePath, 'src', serviceFolder, serviceData.className + '.php'),
         content
     );
@@ -193,16 +186,16 @@ async function updateServiceYamlFile(serviceData: ServiceData, modulePath: strin
     const promptConfig: PromptInterface = await getPromptConfig(path.join(promptFolderPath, 'service_yaml_content.yml'));
     const serviceSlug: string = `${moduleSlug}.${serviceData.slug}`;
     const serviceNameSpace: string = `Drupal\\${moduleSlug}\\${serviceFolderName}\\${serviceData.className}`
-    const createServicesYaml: string = await FileSystemService.pathExists(moduleServiceYamlPath) ? 'FALSE' : 'TRUE';
+    const createServicesYaml: string = await FileSystemWrapper.pathExists(moduleServiceYamlPath) ? 'FALSE' : 'TRUE';
     const message: string = promptConfig.message
         .replace('${service_slug}', serviceSlug)
         .replace('${class_namespace}', serviceNameSpace)
         .replace('${start_from_services}', createServicesYaml)
-    const content: string = await geminiService.sendMessage(message, {
+    const content: string = await GeminiClient.instance.sendMessage(message, {
         systemInstruction: promptConfig.instruction,
     });
 
-    await FileSystemService.createOrUpdateFile(moduleServiceYamlPath, content);
+    await FileSystemWrapper.createOrUpdateFile(moduleServiceYamlPath, content);
 }
 
 /**

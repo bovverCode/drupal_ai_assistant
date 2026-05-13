@@ -1,5 +1,5 @@
 /**
- * Prompt interface.
+ * Define prompt data interface.
  */
 export interface PromptInterface {
     message: string;

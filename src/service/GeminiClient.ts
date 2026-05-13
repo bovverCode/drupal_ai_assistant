@@ -2,11 +2,24 @@
  * Wrapper around the Google Gemini API for content generation.
  */
 import { GoogleGenAI, GenerateContentResponse, GenerateContentConfig } from '@google/genai';
+import { getEnvVar } from '@/functions.ts';
 
-export class GeminiService {
+export class GeminiClient {
+    /**
+     * GeminiClient instance.
+     */
+    static readonly instance: GeminiClient = new GeminiClient(
+        getEnvVar('GEMINI_API_KEY'),
+        getEnvVar('GEMINI_MODEL'),
+    );
+
+    /**
+     * Google GenAI instance.
+     */
     private ai: GoogleGenAI;
 
     /**
+     * GeminiClient constructor.
      * @param apiKey - Gemini API key used to authenticate requests.
      * @param model - Model identifier to use for content generation (e.g. `gemini-2.0-flash`).
      */

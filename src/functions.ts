@@ -3,16 +3,13 @@
  */
 import { Command } from 'commander';
 import path from 'node:path';
-import { FileSystemService } from '@/service/FileSystemService.ts';
+import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
 import { fileURLToPath } from 'node:url';
-import {PromptInterface} from '@/prompt/PromptInterface.ts';
+import { PromptInterface } from '@/type/PromptInterface.ts';
 import yamlParser from 'yaml';
-import { exec } from 'child_process';
-import { promisify } from 'node:util';
+import { CommandModule } from '@/type/CommandModule.js';
 
-// Promisify exec function.
 export const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
-const execPromisified = promisify(exec);
 
 /**
  * Get an environment variable.
@@ -27,21 +24,13 @@ export function getEnvVar(name: string): string {
 }
 
 /**
- * Interface for command modules.
- * Each module must export a `registerCommand(program: Command): void` function.
- */
-interface CommandModule {
-    registerCommand(program: Command): void;
-}
-
-/**
  * Dynamically load and register all command modules from the `command/` directory.
  * Each module must export a `registerCommand(program: Command): void` function.
  * @param program - The Commander instance to register commands on.
  */
 export async function registerCommands(program: Command): Promise<void> {
     const basePath: string = path.join(__dirname, 'command');
-    const commandsFiles: string[] = await FileSystemService.listFolder(basePath, ['js']);
+    const commandsFiles: string[] = await FileSystemWrapper.listFolder(basePath, ['js']);
     for (const filename of commandsFiles) {
        const command = await import(path.join(basePath, filename)) as CommandModule;
        command.registerCommand(program);
@@ -54,16 +43,6 @@ export async function registerCommands(program: Command): Promise<void> {
  * @returns Prompt configuration object.
  */
 export async function getPromptConfig(filePath: string): Promise<PromptInterface> {
-    const promptFileContent: string = await FileSystemService.readFile(filePath);
+    const promptFileContent: string = await FileSystemWrapper.readFile(filePath);
     return yamlParser.parse(promptFileContent);
-}
-
-/**
- * Wrapper to run an external command.
- * @param command - The command to run.
- * @returns Output of the command.
- */
-export async function runExternalCommand(command: string): Promise<string> {
-    const { stdout, stderr } = await execPromisified(command);
-    return stdout || stderr;
 }
