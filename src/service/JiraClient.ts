@@ -20,13 +20,13 @@ export class JiraClient {
      * JiraClient constructor.
      */
     constructor() {
-        const jiraDomain: string = getEnvVar('JIRA_DOMAIN');
         const jiraEmail: string = getEnvVar('JIRA_EMAIL');
         const jiraApiToken: string = getEnvVar('JIRA_API_TOKEN');
+        const jiraCloudId: string = getEnvVar('JIRA_CLOUD_ID');
         const authToken: string = Buffer.from(`${jiraEmail}:${jiraApiToken}`).toString('base64');
         this.jira = axios.create({
             method: 'GET',
-            baseURL: `https://${jiraDomain}/rest/api/3/`,
+            baseURL: `https://api.atlassian.com/ex/jira/${jiraCloudId}/rest/api/3/`,
             headers: {
                 'Authorization': `Basic ${authToken}`,
                 'Content-Type': 'application/json'
@@ -37,7 +37,7 @@ export class JiraClient {
     async getJiraTasks(): Promise<any> {
         const result = await this.jira.get('/issue/CACO1901-5301');
         console.log(result.status);
-        // console.log(result.data);
+        console.log(result.data);
     }
 
 }

@@ -1,9 +1,4 @@
-#### The app requires node.js 20.17.0 or higher.
-### Dev installation:
-1. Clone repository
-2. Run `npm install`
-3. Run `npm run build`
-#### After that you can run `druppy <command>` in the terminal everywhere.
+# Druppy — Drupal AI Helper
 
 ### Remaining tasks:
 - [x] Do standalone cli application
@@ -26,10 +21,52 @@
 - [ ] Introspection of functionality by keywords (agent)?
   - [ ] Give pointer links to IDE in the response to files (PHPstorm plugin?)
 
-### Commands:
-- `druppy chat <message>` - send a message to the AI
-- `druppy service <description>` - create a Drupal service, feel free to put any description
-  - `-p` - option to specify the path to the module (by default, it's looking for closest module directory)
+---
 
-### API configuration:
-- JIRA:
+## Installation
+
+> Requires **Node.js 20.17.0** or higher.
+
+```bash
+git clone <repo-url>
+cd drupal_ai_helper
+npm install
+npm run build
+```
+
+After that, `druppy <command>` is available globally in your terminal.
+
+### Environment configuration
+
+Copy `.env.example` to `.env` and fill in the values:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Description |
+|---|---|
+| `GEMINI_API_KEY` | Your Gemini API key |
+| `GEMINI_MODEL` | Model name, e.g. `gemini-2.0-flash` |
+| `JIRA_EMAIL` | Your Atlassian account email |
+| `JIRA_API_TOKEN` | Your Jira API token |
+| `JIRA_CLOUD_ID` | Your Jira cloud instance ID |
+
+**`GEMINI_API_KEY`** — Get a free key at [Google AI Studio](https://aistudio.google.com/app/apikey). Gemini has a generous free tier, no credit card needed.
+
+**`JIRA_API_TOKEN`** — Generate a token at [Atlassian API Tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
+> **Important:** the token must have the **classic `read:jira-work` scope** to work correctly.
+
+**`JIRA_CLOUD_ID`** — Find it by opening this URL in your browser (replace `<my-site-name>` with your Jira subdomain):
+```
+https://<my-site-name>.atlassian.net/_edge/tenant_info
+```
+The `cloudId` field in the response is your value.
+
+---
+
+## Commands
+
+- `druppy chat <message>` — send a message to the AI
+- `druppy service <description>` — create a Drupal service (describe what it should do)
+  - `-p` — specify the path to the module (default: searches for the closest module directory)
