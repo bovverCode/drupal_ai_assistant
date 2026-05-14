@@ -26,6 +26,6 @@ async function copyMorningUpdate(info: string | undefined): Promise<void> {
 }
 
 function generateMorningUpdate(info: string | undefined): string {
-    JiraClient.instance.getJiraTasks().then().catch();
+    JiraClient.instance.getTasks().then().catch();
     return '';
 }

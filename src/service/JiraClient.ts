@@ -3,6 +3,7 @@
  */
 import axios, { AxiosInstance } from 'axios';
 import { getEnvVar } from '@/functions.js';
+import {json} from "node:stream/consumers";
 
 export class JiraClient {
 
@@ -29,15 +30,11 @@ export class JiraClient {
             baseURL: `https://api.atlassian.com/ex/jira/${jiraCloudId}/rest/api/3/`,
             headers: {
                 'Authorization': `Basic ${authToken}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
         });
     }
 
-    async getJiraTasks(): Promise<any> {
-        const result = await this.jira.get('/issue/CACO1901-5301');
-        console.log(result.status);
-        console.log(result.data);
-    }
-
+    async getTasks(): Promise<any> {}
 }
