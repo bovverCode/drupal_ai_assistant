@@ -30,7 +30,6 @@ export class JiraClient {
             baseURL: `https://api.atlassian.com/ex/jira/${jiraCloudId}/rest/api/3/`,
             headers: {
                 'Authorization': `Basic ${authToken}`,
-                'Content-Type': 'application/json',
                 'Accept': 'application/json'
             }
         });
