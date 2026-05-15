@@ -3,7 +3,6 @@
  */
 import axios, { AxiosInstance } from 'axios';
 import { getEnvVar } from '@/functions.js';
-import {json} from "node:stream/consumers";
 
 export class JiraClient {
 
@@ -35,5 +34,12 @@ export class JiraClient {
         });
     }
 
-    async getTasks(): Promise<any> {}
+    async getTasks(): Promise<any> {
+        const response = await this.jira.get('search/jql', {
+            params: {
+                jql: 'assignee = currentUser() AND status in ("In Progress", "Resolved")',
+                fields: ['*all']
+            }
+        });
+    }
 }
