@@ -4,6 +4,7 @@
 import { Command, OptionValues } from 'commander';
 import { CliCommandsWrapper } from "@/service/CliCommandsWrapper.js";
 import { JiraClient } from '@/service/JiraClient.js';
+import { JiraTask } from '@/dto/JiraTask.js';
 
 /**
  * Register the `morning` command.
@@ -21,11 +22,11 @@ export function registerCommand(program: Command): void {
 }
 
 async function copyMorningUpdate(info: string | undefined): Promise<void> {
-    const morningUpdate: string = generateMorningUpdate(info);
+    const morningUpdate: string = await generateMorningUpdate(info);
     await CliCommandsWrapper.copyToClipboard(morningUpdate, true);
 }
 
-function generateMorningUpdate(info: string | undefined): string {
-    JiraClient.instance.getTasks().then().catch();
+async function generateMorningUpdate(info: string | undefined): Promise<string> {
+    const tasks: JiraTask[] = await JiraClient.instance.getTasks();
     return '';
 }

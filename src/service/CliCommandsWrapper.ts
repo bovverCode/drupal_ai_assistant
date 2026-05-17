@@ -9,7 +9,7 @@ import clipboard from 'clipboardy';
 export class CliCommandsWrapper {
 
     // Promisify exec function.
-    static execPromisified: (command: string, options?: ExecOptions) => PromiseWithChild<{ stdout: string, stderr: string }> = promisify(exec);
+    private static execPromisified: (command: string, options?: ExecOptions) => PromiseWithChild<{ stdout: string, stderr: string }> = promisify(exec);
 
     /**
      * Wrapper to run an external command.
