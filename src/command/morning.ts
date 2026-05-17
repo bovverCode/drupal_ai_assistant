@@ -2,9 +2,10 @@
  * `morning` command — generate and copy morning Slack update.
  */
 import { Command, OptionValues } from 'commander';
-import { CliCommandsWrapper } from "@/service/CliCommandsWrapper.js";
-import { JiraClient } from '@/service/JiraClient.js';
-import { JiraTask } from '@/dto/JiraTask.js';
+import { CliCommandsWrapper } from "@/service/CliCommandsWrapper.ts";
+import { JiraClient } from '@/service/JiraClient.ts';
+import { JiraTask } from '@/dto/JiraTask.ts';
+import {GeminiClient} from "@/service/GeminiClient.js";
 
 /**
  * Register the `morning` command.
@@ -15,18 +16,27 @@ export function registerCommand(program: Command): void {
     program
         .command('morning')
         .description('Generate and copy morning Slack update')
-        .option('-i, --info', 'Additional info to update')
+        .option('-i, --info', 'Additional info to update', '')
         .action(async (options: OptionValues) => {
             await copyMorningUpdate(options.info);
         });
 }
 
-async function copyMorningUpdate(info: string | undefined): Promise<void> {
+/**
+ * Generate and copy morning Slack update.
+ * @param info - Additional info to update.
+ */
+async function copyMorningUpdate(info: string): Promise<void> {
     const morningUpdate: string = await generateMorningUpdate(info);
     await CliCommandsWrapper.copyToClipboard(morningUpdate, true);
 }
 
-async function generateMorningUpdate(info: string | undefined): Promise<string> {
+/**
+ * Generate morning Slack update.
+ * @param info - Additional info to update.
+ * @returns string;
+ */
+async function generateMorningUpdate(info: string): Promise<string> {
     const tasks: JiraTask[] = await JiraClient.instance.getTasks();
     return '';
 }

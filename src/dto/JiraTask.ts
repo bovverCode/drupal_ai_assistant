@@ -20,6 +20,7 @@ export class JiraTask {
      * @param status - Task status.
      * @param statusChangedTimestamp - Task status changed timestamp.
      * @param comments - Task comments raw string.
+     * @param lastCommits - Task last commits raw string.
      */
     constructor(
         readonly name: string,
@@ -28,8 +29,17 @@ export class JiraTask {
         readonly status: string,
         readonly statusChangedTimestamp: Date,
         readonly comments: string,
-    ) {
+        readonly lastCommits: string,
+    ) {}
 
+    toString(): string {
+        return `name: ${this.name}\n` +
+            `branchCode: ${this.branchCode}\n` +
+            `link: ${this.link}\n` +
+            `status: ${this.status}\n` +
+            `statusChangedTimestamp: ${this.statusChangedTimestamp}\n` +
+            `comments: ${this.comments}\n` +
+            `lastCommits: ${this.lastCommits}`;
     }
 
 }

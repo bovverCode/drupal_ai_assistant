@@ -2,8 +2,9 @@
  * Wrapper around the Google JIRA Rest API.
  */
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { getEnvVar } from '@/functions.js';
+import { getEnvVar } from '@/functions.ts';
 import { JiraTask, Status as JiraStatus } from '@/dto/JiraTask.ts';
+import { GitClient } from '@/service/GitClient.ts';
 
 export class JiraClient {
 
@@ -18,9 +19,15 @@ export class JiraClient {
     private jira: AxiosInstance;
 
     /**
+     * Base task link.
+     */
+    private readonly baseTaskLink: string;
+
+    /**
      * JiraClient constructor.
      */
     constructor() {
+        this.baseTaskLink = `https://${getEnvVar('JIRA_SUBDOMAIN')}.atlassian.net/browse/`;
         const jiraEmail: string = getEnvVar('JIRA_EMAIL');
         const jiraApiToken: string = getEnvVar('JIRA_API_TOKEN');
         const jiraCloudId: string = getEnvVar('JIRA_CLOUD_ID');
@@ -46,19 +53,30 @@ export class JiraClient {
             const response: AxiosResponse = await this.jira.get('search/jql', {
                 params: {
                     jql: `assignee = currentUser() AND status in ("${JiraStatus.InProgress}", "${JiraStatus.Resolved}")`,
-                    fields: ['summary', 'status', 'comment', 'labels', 'assignee']
+                    fields: ['summary', 'status', 'comment', 'labels', 'assignee', 'statuscategorychangedate']
                 }
             });
+
             for (const issue of response.data.issues) {
                 if (!issue) {
                     continue;
                 }
                 const taskName: string | undefined = issue.fields.summary;
-                const branchCode: string | undefined = issue.fields.key;
-                const link: string | undefined = 'TBD';
+                const branchCode: string | undefined = issue.key;
                 const status: string | undefined = issue.fields.status.name;
-                const statusChangedTimestamp: Date | undefined = undefined;
+                const statusChangedTime: string | undefined = issue.fields.statuscategorychangedate;
+                if (!taskName || !branchCode || !status || !statusChangedTime) continue;
+                const commits = await GitClient.getBranchLatestCommits(branchCode);
+                if (!commits && status === JiraStatus.Resolved) {
+                    // Skip old resolved tasks.
+                    continue;
+                }
+                const statusChangedDate: Date = new Date(statusChangedTime);
                 const comments: string | undefined = this.getCommentsFromIssueResponse(issue);
+                const link: string = this.baseTaskLink + branchCode;
+                result.push(
+                    new JiraTask(taskName, branchCode, link, status, statusChangedDate, comments, commits)
+                );
             }
         } catch (error) {
             const errorMessage: string = error instanceof Error ? error.message : String(error);
