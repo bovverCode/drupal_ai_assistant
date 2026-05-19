@@ -32,6 +32,10 @@ export class JiraTask {
         readonly lastCommits: string,
     ) {}
 
+    /**
+     * Convert Jira task to string.
+     * @returns String representation of a Jira task.
+     */
     toString(): string {
         return `name: ${this.name}\n` +
             `branchCode: ${this.branchCode}\n` +

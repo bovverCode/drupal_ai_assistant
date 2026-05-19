@@ -64,6 +64,7 @@ export class JiraClient {
                 const taskName: string | undefined = issue.fields.summary;
                 const branchCode: string | undefined = issue.key;
                 const status: string | undefined = issue.fields.status.name;
+                // @todo Do we need the status changed time?
                 const statusChangedTime: string | undefined = issue.fields.statuscategorychangedate;
                 if (!taskName || !branchCode || !status || !statusChangedTime) continue;
                 const commits = await GitClient.getBranchLatestCommits(branchCode);

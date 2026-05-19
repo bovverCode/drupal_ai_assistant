@@ -17,6 +17,6 @@ export function registerCommand(program: Command): void {
         .action((message: string) => {
             GeminiClient.instance.sendMessage(message)
                 .then((response: string) => console.log(response))
-                .catch((error: Error) => program.error(error instanceof Error ? error.message : String(error)))
+                .catch((error: Error) => program.error(error instanceof Error ? error.message : String(error)));
         });
 }

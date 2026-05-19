@@ -5,7 +5,7 @@ import { Command } from 'commander';
 import path from 'node:path';
 import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
 import { fileURLToPath } from 'node:url';
-import { PromptInterface } from '@/type/PromptInterface.ts';
+import { Prompt } from './type/Prompt.ts';
 import yamlParser from 'yaml';
 import { CommandModule } from '@/type/CommandModule.js';
 
@@ -42,7 +42,7 @@ export async function registerCommands(program: Command): Promise<void> {
  * @param filePath - Path to the prompt yml file.
  * @returns Prompt configuration object.
  */
-export async function getPromptConfig(filePath: string): Promise<PromptInterface> {
+export async function getPromptConfig(filePath: string): Promise<Prompt> {
     const promptFileContent: string = await FileSystemWrapper.readFile(filePath);
     return yamlParser.parse(promptFileContent);
 }

@@ -1,11 +1,21 @@
 /**
  * `morning` command — generate and copy morning Slack update.
  */
-import { Command, OptionValues } from 'commander';
-import { CliCommandsWrapper } from "@/service/CliCommandsWrapper.ts";
+import { Command } from 'commander';
+import { CliCommandsWrapper } from '@/service/CliCommandsWrapper.ts';
 import { JiraClient } from '@/service/JiraClient.ts';
 import { JiraTask } from '@/dto/JiraTask.ts';
-import {GeminiClient} from "@/service/GeminiClient.js";
+import { input, confirm } from '@inquirer/prompts';
+import { GeminiClient } from '@/service/GeminiClient.ts';
+import { Prompt } from '../type/Prompt.ts';
+import { getPromptConfig, __dirname } from '@/functions.ts';
+import path from 'node:path';
+import { ClipboardContent } from '@/type/ClipboardContent.ts';
+
+/**
+ * Morning prompt folder path.
+ */
+const promptFolderPath: string = path.join(__dirname, 'prompt/morning');
 
 /**
  * Register the `morning` command.
@@ -16,27 +26,77 @@ export function registerCommand(program: Command): void {
     program
         .command('morning')
         .description('Generate and copy morning Slack update')
-        .option('-i, --info', 'Additional info to update', '')
-        .action(async (options: OptionValues) => {
-            await copyMorningUpdate(options.info);
+        .action(() => {
+            copyMorningUpdate()
+                .catch(error => program.error(error instanceof Error ? error.message : String(error)));
         });
 }
 
 /**
  * Generate and copy morning Slack update.
- * @param info - Additional info to update.
  */
-async function copyMorningUpdate(info: string): Promise<void> {
-    const morningUpdate: string = await generateMorningUpdate(info);
+async function copyMorningUpdate(): Promise<void> {
+    // @todo
+    // - do not repeat the old info about tasks
+    // - check activity in onHold tasks as well
+    const morningUpdate: ClipboardContent = await generateMorningUpdate();
     await CliCommandsWrapper.copyToClipboard(morningUpdate, true);
 }
 
 /**
  * Generate morning Slack update.
- * @param info - Additional info to update.
  * @returns string;
  */
-async function generateMorningUpdate(info: string): Promise<string> {
+async function generateMorningUpdate(): Promise<ClipboardContent> {
+    const additionalInfo: string = await input({ message: 'Please, enter additional info (optional):'});
     const tasks: JiraTask[] = await JiraClient.instance.getTasks();
-    return '';
+    const htmlPromptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'morning_html.yml'));
+    const htmlGeminiMessage: string = await getHtmlPromptMessage(tasks, additionalInfo, htmlPromptConfig);
+    let htmlResponse: string = await GeminiClient.instance.sendMessage(htmlGeminiMessage, { systemInstruction: htmlPromptConfig.instruction });
+    console.log(htmlResponse);
+    while (!await confirm({ message: 'Is this morning update correct?'})) {
+        const retryMessage: string = htmlPromptConfig.retry.replace('${user_input}', htmlResponse);
+        console.log('💫 Taking another shot...');
+        htmlResponse = await GeminiClient.instance.sendMessage(
+            htmlGeminiMessage + retryMessage,
+            { systemInstruction: htmlPromptConfig.instruction }
+        );
+        console.log(htmlResponse);
+    }
+
+    const plainPromptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'morning_plain.yml'));
+    const plainGeminiMessage: string = await getPlainPromptMessage(htmlResponse, plainPromptConfig);
+    const plainResponse: string = await GeminiClient.instance.sendMessage(plainGeminiMessage, { systemInstruction: plainPromptConfig.instruction });
+
+    return {
+      html: htmlResponse,
+      plain: plainResponse
+    };
+}
+
+/**
+ * Get HTML prompt message.
+ * @param tasks - Jira tasks.
+ * @param additionalInfo - Additional info.
+ * @param htmlPromptConfig - HTML prompt config.
+ * @throws Error if not enough data to generate morning update.
+ */
+function getHtmlPromptMessage(tasks: JiraTask[], additionalInfo: string, htmlPromptConfig: Prompt): string {
+    let tasksMessage: string = '';
+    for (const task of tasks) {
+        tasksMessage += task.toString() + '\n';
+    }
+    if (!tasksMessage && !additionalInfo) {
+        throw new Error('Not enough data to generate morning update.');
+    }
+    return htmlPromptConfig.message.replace('${user_input}', `${tasksMessage} \n Additional: ${additionalInfo}`);
+}
+
+/**
+ * Get plain prompt message.
+ * @param html - update HTML.
+ * @param plainPromptConfig - Plain prompt config.
+ */
+function getPlainPromptMessage(html: string, plainPromptConfig: Prompt): string {
+    return plainPromptConfig.message.replace('${user_input}', html);
 }

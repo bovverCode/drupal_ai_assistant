@@ -5,7 +5,7 @@ import { Command, OptionValues } from 'commander';
 import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
 import path from 'node:path';
 import { GeminiClient } from '@/service/GeminiClient.ts';
-import { PromptInterface } from '@/type/PromptInterface.ts';
+import { Prompt } from '../type/Prompt.ts';
 import { confirm } from '@inquirer/prompts';
 import { __dirname, getPromptConfig } from '@/functions.ts';
 import { CliCommandsWrapper } from '@/service/CliCommandsWrapper.ts';
@@ -101,7 +101,7 @@ async function generateServiceData(
     serviceInfo: string,
     previousData: Partial<ServiceData> = {}
 ): Promise<ServiceData> {
-    const promptConfig: PromptInterface = await getPromptConfig(path.join(promptFolderPath, 'service.yml'));
+    const promptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'service.yml'));
     const message: string = promptConfig.message.replace('${user_input}', serviceInfo);
     // Add previous data to the message if it exists (retry case).
     const finalMessage = previousData.className ?
@@ -151,7 +151,7 @@ async function createServiceClass(serviceData: ServiceData, modulePath: string):
     }
 
     // Prepare service class data.
-    const promptConfig: PromptInterface = await getPromptConfig(path.join(promptFolderPath, 'service_class_content.yml'));
+    const promptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'service_class_content.yml'));
     const moduleSlug: string | undefined = extractModuleSlug(modulePath);
     if (!moduleSlug) throw new Error('Could not get module slug from: ' + modulePath);
     const namespace: string = `Drupal\\${moduleSlug}\\${serviceFolder}`;
@@ -183,7 +183,7 @@ async function updateServiceYamlFile(serviceData: ServiceData, modulePath: strin
     const moduleServiceYamlPath: string = path.join(modulePath, `${moduleSlug}.services.yml`);
 
     // Prepare Gemini API request data.
-    const promptConfig: PromptInterface = await getPromptConfig(path.join(promptFolderPath, 'service_yaml_content.yml'));
+    const promptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'service_yaml_content.yml'));
     const serviceSlug: string = `${moduleSlug}.${serviceData.slug}`;
     const serviceNameSpace: string = `Drupal\\${moduleSlug}\\${serviceFolderName}\\${serviceData.className}`
     const createServicesYaml: string = await FileSystemWrapper.pathExists(moduleServiceYamlPath) ? 'FALSE' : 'TRUE';
