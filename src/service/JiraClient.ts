@@ -52,7 +52,7 @@ export class JiraClient {
         try {
             const response: AxiosResponse = await this.jira.get('search/jql', {
                 params: {
-                    jql: `assignee = currentUser() AND status in ("${JiraStatus.InProgress}", "${JiraStatus.Resolved}")`,
+                    jql: `assignee = currentUser() AND status in ("${JiraStatus.InProgress}", "${JiraStatus.Resolved}", "${JiraStatus.OnHold}")`,
                     fields: ['summary', 'status', 'comment', 'labels', 'assignee', 'statuscategorychangedate']
                 }
             });
@@ -64,7 +64,6 @@ export class JiraClient {
                 const taskName: string | undefined = issue.fields.summary;
                 const branchCode: string | undefined = issue.key;
                 const status: string | undefined = issue.fields.status.name;
-                // @todo Do we need the status changed time?
                 const statusChangedTime: string | undefined = issue.fields.statuscategorychangedate;
                 if (!taskName || !branchCode || !status || !statusChangedTime) continue;
                 const commits = await GitClient.getBranchLatestCommits(branchCode);
@@ -98,7 +97,7 @@ export class JiraClient {
         for (const comment of issueResponse.fields.comment.comments) {
             const author: string = comment.author.displayName === myName ? 'Me' : comment.author.displayName;
             result += `Author: ${author}\n`;
-            result += this.getCommentItemContent(comment.body.content);
+            result += this.getCommentItemContent(comment.body.content, myName);
             result += '\n';
         }
         result += '```'
@@ -108,21 +107,22 @@ export class JiraClient {
     /**
      * Get comment item content.
      * @param contentItems - Array of comment items.
+     * @param myName - My Jira name.
      * @returns - String containing the comment item content.
      * @private
      */
-    private getCommentItemContent(contentItems: any): string {
+    private getCommentItemContent(contentItems: any, myName: string): string {
         let result = '';
         for (const contentItem of contentItems) {
             if (contentItem.content) {
-                const commentItemContent = this.getCommentItemContent(contentItem.content);
+                const commentItemContent = this.getCommentItemContent(contentItem.content, myName);
                 result += commentItemContent;
                 if (contentItem.type === 'paragraph') {
                     result += '\n';
                 }
                 continue;
             }
-            const itemContent = this.getItemContentByType(contentItem);
+            const itemContent = this.getItemContentByType(contentItem, myName);
             if (itemContent.trim() === '') continue;
             result += itemContent;
         }
@@ -132,15 +132,17 @@ export class JiraClient {
     /**
      * Get item content by type.
      * @param contentItem - Content item object.
+     * @param myName - My Jira name.
      * @returns - String containing the item content.
      * @private
      */
-    private getItemContentByType(contentItem: any): string {
+    private getItemContentByType(contentItem: any, myName: string): string {
         switch (contentItem.type) {
             case 'text':
                 return contentItem.text;
             case 'mention':
-                return 'Mentioned: ' + contentItem.attrs.text;
+                const name = contentItem.attrs.text === `@${myName}` ? 'Me' : contentItem.attrs.text;
+                return `Mentioned: ${name} `;
             default:
                 return '';
         }

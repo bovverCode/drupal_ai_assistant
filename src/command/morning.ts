@@ -51,7 +51,7 @@ async function generateMorningUpdate(): Promise<ClipboardContent> {
     const additionalInfo: string = await input({ message: 'Please, enter additional info (optional):'});
     const tasks: JiraTask[] = await JiraClient.instance.getTasks();
     const htmlPromptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'morning_html.yml'));
-    const htmlGeminiMessage: string = await getHtmlPromptMessage(tasks, additionalInfo, htmlPromptConfig);
+    const htmlGeminiMessage: string = getHtmlPromptMessage(tasks, additionalInfo, htmlPromptConfig);
     let htmlResponse: string = await GeminiClient.instance.sendMessage(htmlGeminiMessage, { systemInstruction: htmlPromptConfig.instruction });
     console.log(htmlResponse);
     while (!await confirm({ message: 'Is this morning update correct?'})) {
@@ -65,7 +65,7 @@ async function generateMorningUpdate(): Promise<ClipboardContent> {
     }
 
     const plainPromptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'morning_plain.yml'));
-    const plainGeminiMessage: string = await getPlainPromptMessage(htmlResponse, plainPromptConfig);
+    const plainGeminiMessage: string = getPlainPromptMessage(htmlResponse, plainPromptConfig);
     const plainResponse: string = await GeminiClient.instance.sendMessage(plainGeminiMessage, { systemInstruction: plainPromptConfig.instruction });
 
     return {
@@ -83,13 +83,18 @@ async function generateMorningUpdate(): Promise<ClipboardContent> {
  */
 function getHtmlPromptMessage(tasks: JiraTask[], additionalInfo: string, htmlPromptConfig: Prompt): string {
     let tasksMessage: string = '';
+    let additionalInfoMessage: string = '';
+    if (additionalInfo) {
+        additionalInfoMessage = `Additional: ${additionalInfo}`;
+    }
     for (const task of tasks) {
         tasksMessage += task.toString() + '\n';
     }
     if (!tasksMessage && !additionalInfo) {
         throw new Error('Not enough data to generate morning update.');
     }
-    return htmlPromptConfig.message.replace('${user_input}', `${tasksMessage} \n Additional: ${additionalInfo}`);
+
+    return htmlPromptConfig.message.replace('${user_input}', `${tasksMessage} \n ${additionalInfoMessage}`);
 }
 
 /**

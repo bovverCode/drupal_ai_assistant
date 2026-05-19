@@ -7,7 +7,8 @@
  */
 export enum Status {
     InProgress = 'In Progress',
-    Resolved = 'Resolved'
+    Resolved = 'Resolved',
+    OnHold = 'OnHold',
 }
 
 export class JiraTask {
@@ -37,13 +38,13 @@ export class JiraTask {
      * @returns String representation of a Jira task.
      */
     toString(): string {
-        return `name: ${this.name}\n` +
-            `branchCode: ${this.branchCode}\n` +
-            `link: ${this.link}\n` +
-            `status: ${this.status}\n` +
-            `statusChangedTimestamp: ${this.statusChangedTimestamp}\n` +
-            `comments: ${this.comments}\n` +
-            `lastCommits: ${this.lastCommits}`;
+        return `Task name: ${this.name}\n` +
+            `Task short code: ${this.branchCode}\n` +
+            `Task link: ${this.link}\n` +
+            `Current task status: ${this.status}\n` +
+            `Task status changed at: ${this.statusChangedTimestamp}\n` +
+            `Task comments: ${this.comments}\n` +
+            `Latest task commits: ${this.lastCommits}`;
     }
 
 }
