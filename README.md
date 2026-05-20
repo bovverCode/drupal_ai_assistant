@@ -4,7 +4,7 @@
 - [x] Do standalone cli application
 - [X] Question - answer (AI)
 - [x] Create a service in the closest module by name
-- [ ] Writing update (analyze yesterday work) commits by my name, ask additional info (use pattern)
+- [x] Writing update (analyze yesterday work) commits by my name, ask additional info (use pattern)
 - [ ] Analysis of changes in the current branch or specified one
 - [ ] Analysis of the module
 - [ ] Generate a .po file content by branch diff, check for duplicates
@@ -36,6 +36,22 @@ npm run build
 
 After that, `druppy <command>` is available globally in your terminal.
 
+### Python requirement
+
+The clipboard integration uses a Python script with **PyQt5** to write both plain text and HTML to the clipboard simultaneously (native clipboard APIs in Node.js do not support rich MIME types).
+
+> Requires **Python 3** and the `PyQt5` package.
+
+```bash
+pip install PyQt5
+```
+
+On Linux you may also need the Qt platform plugin:
+
+```bash
+sudo apt install python3-pyqt5
+```
+
 ### Environment configuration
 
 Copy `.env.example` to `.env` and fill in the values:
@@ -51,6 +67,8 @@ cp .env.example .env
 | `JIRA_EMAIL` | Your Atlassian account email |
 | `JIRA_API_TOKEN` | Your Jira API token |
 | `JIRA_CLOUD_ID` | Your Jira cloud instance ID |
+| `JIRA_SUBDOMAIN` | Your Jira subdomain (e.g. `mycompany` from `mycompany.atlassian.net`) |
+| `DOTENV_CONFIG_QUIET` | Set to `1` to suppress dotenv loading messages |
 
 **`GEMINI_API_KEY`** — Get a free key at [Google AI Studio](https://aistudio.google.com/app/apikey). Gemini has a generous free tier, no credit card needed.
 
@@ -70,3 +88,7 @@ The `cloudId` field in the response is your value.
 - `druppy chat <message>` — send a message to the AI
 - `druppy service <description>` — create a Drupal service (describe what it should do)
   - `-p` — specify the path to the module (default: searches for the closest module directory)
+- `druppy morning` — generate a morning Slack standup update and copy it to clipboard
+  - Fetches your active Jira tasks and recent comments, then uses AI to generate a formatted HTML update ready to paste into Slack
+  - Prompts for optional additional info (e.g. "will review teammates' PRs")
+  - Shows a preview and asks for confirmation before copying; re-generates if rejected

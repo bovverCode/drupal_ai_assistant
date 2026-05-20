@@ -3,6 +3,7 @@
  */
 import { Command } from 'commander';
 import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
+import { handleProgramError } from '@/functions.ts';
 
 /**
  * Register the `list` command.
@@ -16,7 +17,7 @@ export function registerCommand(program: Command): void {
         .argument('[path]', 'Absolute path to the folder', process.cwd())
         .action((path: string) => {
             list(path)
-                .catch(error => program.error(error instanceof Error ? error.message : String(error)));
+                .catch((error) => handleProgramError(program, error))
         });
 }
 

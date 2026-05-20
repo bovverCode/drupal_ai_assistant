@@ -73,6 +73,10 @@ export class JiraClient {
                 }
                 const statusChangedDate: Date = new Date(statusChangedTime);
                 const comments: string | undefined = this.getCommentsFromIssueResponse(issue);
+                if (!comments && !commits && status === JiraStatus.OnHold) {
+                    // Skip old onHold tasks.
+                    continue;
+                }
                 const link: string = this.baseTaskLink + branchCode;
                 result.push(
                     new JiraTask(taskName, branchCode, link, status, statusChangedDate, comments, commits)
@@ -93,15 +97,25 @@ export class JiraClient {
      */
     private getCommentsFromIssueResponse(issueResponse: any): string {
         const myName: string = issueResponse.fields.assignee.displayName ?? '';
-        let result = '```text\n';
+        const yesterdayDate: Date = new Date();
+        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+        yesterdayDate.setHours(0, 0, 0, 0);
+        let result = '';
         for (const comment of issueResponse.fields.comment.comments) {
+            const commentDate: Date = new Date(comment.created);
+            if (commentDate.getTime() < yesterdayDate.getTime()) {
+                // Skip comments added before yesterday.
+                continue;
+            }
             const author: string = comment.author.displayName === myName ? 'Me' : comment.author.displayName;
             result += `Author: ${author}\n`;
             result += this.getCommentItemContent(comment.body.content, myName);
             result += '\n';
         }
-        result += '```'
-        return result;
+        if (!result) {
+            return result;
+        }
+        return '```text\n' + result + '```';
     }
 
     /**

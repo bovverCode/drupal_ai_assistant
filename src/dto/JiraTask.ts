@@ -19,7 +19,7 @@ export class JiraTask {
      * @param branchCode - Branch code (like `DEV-1234`).
      * @param link - Task link.
      * @param status - Task status.
-     * @param statusChangedTimestamp - Task status changed timestamp.
+     * @param statusChangedDate - Task status changed date.
      * @param comments - Task comments raw string.
      * @param lastCommits - Task last commits raw string.
      */
@@ -28,7 +28,7 @@ export class JiraTask {
         readonly branchCode: string,
         readonly link: string,
         readonly status: string,
-        readonly statusChangedTimestamp: Date,
+        readonly statusChangedDate: Date,
         readonly comments: string,
         readonly lastCommits: string,
     ) {}
@@ -42,9 +42,21 @@ export class JiraTask {
             `Task short code: ${this.branchCode}\n` +
             `Task link: ${this.link}\n` +
             `Current task status: ${this.status}\n` +
-            `Task status changed at: ${this.statusChangedTimestamp}\n` +
+            `Task status changed at: ${this.getSimplifiedStatusDate()}\n` +
             `Task comments: ${this.comments}\n` +
             `Latest task commits: ${this.lastCommits}`;
+    }
+
+    /**
+     * Get simplified task status date.
+     * @returns Task status simplified date.
+     */
+    private getSimplifiedStatusDate(): string {
+        const today: Date = new Date();
+        today.setHours(0, 0, 0, 0);
+        const statusDate: Date = new Date(this.statusChangedDate);
+        statusDate.setHours(0, 0, 0, 0);
+        return statusDate.getTime() === today.getTime() ? 'today' : 'started few days ago';
     }
 
 }

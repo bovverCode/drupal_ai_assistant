@@ -7,7 +7,7 @@ import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
 import { fileURLToPath } from 'node:url';
 import { Prompt } from './type/Prompt.ts';
 import yamlParser from 'yaml';
-import { CommandModule } from '@/type/CommandModule.js';
+import { CommandModule } from '@/type/CommandModule.ts';
 
 export const __dirname: string = path.dirname(fileURLToPath(import.meta.url));
 
@@ -45,4 +45,15 @@ export async function registerCommands(program: Command): Promise<void> {
 export async function getPromptConfig(filePath: string): Promise<Prompt> {
     const promptFileContent: string = await FileSystemWrapper.readFile(filePath);
     return yamlParser.parse(promptFileContent);
+}
+
+/**
+ * Handle program error.
+ * @param program - Program instance.
+ * @param error - Error object or anything else.
+ */
+export function handleProgramError(program: Command, error: unknown): void {
+    program.error(
+        '💀 ' + (error instanceof Error ? error.message : String(error))
+    );
 }

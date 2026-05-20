@@ -7,9 +7,9 @@ import path from 'node:path';
 import { GeminiClient } from '@/service/GeminiClient.ts';
 import { Prompt } from '../type/Prompt.ts';
 import { confirm } from '@inquirer/prompts';
-import { __dirname, getPromptConfig } from '@/functions.ts';
+import {__dirname, getPromptConfig, handleProgramError} from '@/functions.ts';
 import { CliCommandsWrapper } from '@/service/CliCommandsWrapper.ts';
-import {ServiceData} from "@/type/ServiceData.js";
+import { ServiceData } from '@/type/ServiceData.ts';
 
 /**
  * The maximum depth of the Drupal module info file directory lookup.
@@ -37,7 +37,7 @@ export function registerCommand(program: Command): void {
         .action((serviceInfo: string, options: OptionValues) => {
             createService(serviceInfo, options.path)
                 .then(() => console.log('✅ Service successfully created'))
-                .catch(error => program.error('💀 ' + (error instanceof Error ? error.message : String(error))))
+                .catch((error) => handleProgramError(program, error))
         });
 }
 

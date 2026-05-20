@@ -8,7 +8,7 @@ import { JiraTask } from '@/dto/JiraTask.ts';
 import { input, confirm } from '@inquirer/prompts';
 import { GeminiClient } from '@/service/GeminiClient.ts';
 import { Prompt } from '../type/Prompt.ts';
-import { getPromptConfig, __dirname } from '@/functions.ts';
+import { getPromptConfig, __dirname, handleProgramError } from '@/functions.ts';
 import path from 'node:path';
 import { ClipboardContent } from '@/type/ClipboardContent.ts';
 
@@ -28,7 +28,7 @@ export function registerCommand(program: Command): void {
         .description('Generate and copy morning Slack update')
         .action(() => {
             copyMorningUpdate()
-                .catch(error => program.error(error instanceof Error ? error.message : String(error)));
+                .catch((error) => handleProgramError(program, error))
         });
 }
 
