@@ -27,7 +27,7 @@ export class GitClient {
         try {
             return await CliCommandsWrapper.runExternalCommand(command);
         } catch (error) {
-            console.warn(`Branch ${branch} not found since ${dayScope}.`);
+            console.warn(`Branch ${branch} commits not found since ${dayScope}.`);
             return '';
         }
 
