@@ -19,7 +19,7 @@ const maxDepth: number = 7;
 /**
  * Service prompt folder path.
  */
-const promptFolderPath: string = path.join(__dirname, 'prompt/service');
+const promptFolderPath: string = path.join(__dirname, '../prompt/service');
 
 /**
  * Register the `service` command.

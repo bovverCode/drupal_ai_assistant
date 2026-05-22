@@ -15,7 +15,7 @@ import { ClipboardContent } from '@/type/ClipboardContent.ts';
 /**
  * Morning prompt folder path.
  */
-const promptFolderPath: string = path.join(__dirname, 'prompt/morning');
+const promptFolderPath: string = path.join(__dirname, '../prompt/morning');
 
 /**
  * Register the `morning` command.
@@ -36,9 +36,8 @@ export function registerCommand(program: Command): void {
  * Generate and copy morning Slack update.
  */
 async function copyMorningUpdate(): Promise<void> {
-    // @todo
-    // - do not repeat the old info about tasks
-    // - check activity in onHold tasks as well
+    // @todo check BitBucket to add worked on Prs
+    // @todo if pr was created few days ago, but i updated the PR then it should say, that i updated the PR (now it thinks that i finished working on the task)
     const morningUpdate: ClipboardContent = await generateMorningUpdate();
     await CliCommandsWrapper.copyToClipboard(morningUpdate, true);
 }

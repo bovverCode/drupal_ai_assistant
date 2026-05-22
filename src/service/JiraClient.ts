@@ -67,20 +67,12 @@ export class JiraClient {
                 const statusChangedTime: string | undefined = issue.fields.statuscategorychangedate;
                 if (!taskName || !branchCode || !status || !statusChangedTime) continue;
                 const commits = await GitClient.getBranchLatestCommits(branchCode);
-                if (!commits && status === JiraStatus.Resolved) {
-                    // Skip old resolved tasks.
-                    continue;
-                }
                 const statusChangedDate: Date = new Date(statusChangedTime);
                 const comments: string | undefined = this.getCommentsFromIssueResponse(issue);
-                if (!comments && !commits && status === JiraStatus.OnHold) {
-                    // Skip old onHold tasks.
-                    continue;
-                }
                 const link: string = this.baseTaskLink + branchCode;
-                result.push(
-                    new JiraTask(taskName, branchCode, link, status, statusChangedDate, comments, commits)
-                );
+                const task: JiraTask =  new JiraTask(taskName, branchCode, link, status, statusChangedDate, comments, commits);
+                if (!this.taskIsActual(task)) continue;
+                result.push(task);
             }
         } catch (error) {
             const errorMessage: string = error instanceof Error ? error.message : String(error);
@@ -160,5 +152,25 @@ export class JiraClient {
             default:
                 return '';
         }
+    }
+
+    /**
+     * Whether a task should be included in the update.
+     * @param task - Jira task object.
+     * @returns true in case a task should be included to the update, false otherwise.
+     * @private
+     */
+    private taskIsActual(task: JiraTask): boolean {
+        // @todo if i've created a PR today, but last commit was yesterday, then it's missing in the update.
+        if (!task.lastCommits && task.status === JiraStatus.Resolved) {
+            // Skip old resolved tasks.
+            return false;
+        }
+        if (!task.comments && !task.lastCommits && task.status === JiraStatus.OnHold) {
+            // Skip old onHold tasks.
+            return false;
+        }
+
+        return true;
     }
 }

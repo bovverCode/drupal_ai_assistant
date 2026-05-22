@@ -4,6 +4,7 @@
 import { Command } from 'commander';
 import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
 import { handleProgramError } from '@/functions.ts';
+import {BitbucketClient} from "@/service/BitbucketClient.js";
 
 /**
  * Register the `list` command.
@@ -26,6 +27,7 @@ export function registerCommand(program: Command): void {
  * @param path - Path to folder to list.
  */
 async function list(path: string): Promise<void> {
+    BitbucketClient.instance.didUserReviewYesterday();
     const files: string[] = await FileSystemWrapper.listFolder(path);
     files.forEach(file => {
         console.log(file);

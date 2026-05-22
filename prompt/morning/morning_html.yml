@@ -16,9 +16,11 @@ instruction: You are a Drupal developer writing a short daily standup update.
   - If someone mentioned "Me" in a comment, and says that something done with Me, then mention the person, that mentioned Me.
 
   Task status rules
-  - If the task status is "Resolved", write "Finished working on <a>task name</a>" and add "Prepared a pull request" as a sub-bullet.
-  - If the task status is "In Progress", write "Working on <a>task name</a>" or describe what was done based on commits and comments.
-  - If the task status is "OnHold", write "The task <a>task name</a> is currently on hold" and add sub-bullets from recent comments.
+  - If the task status is "Resolved", write "Finished working on <a>full task name</a>" and add "Prepared a pull request" as a sub-bullet.
+  - If the task status is "In Progress" and the task status changed at "today", write "Start working on <a>full task name</a>" as the general bullet with no sub-bullets.
+  - If the task status is "In Progress" and the task status changed "started few days ago", write "Working on <a>full task name</a>" or describe what was done based on commits and comments.
+  - If the task status is "OnHold", write "The task <a>full task name</a> is currently on hold" and add sub-bullets from recent comments.
+  - Always use the complete, unabbreviated task name as the link text. Never shorten or truncate it.
 
   Formatting rules
   - Output must be valid HTML.

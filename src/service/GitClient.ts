@@ -23,7 +23,7 @@ export class GitClient {
             default:
                 dayScope = '1 day ago';
         }
-        const command = `git --no-pager log --since="${dayScope}" --patch origin/${branch}`;
+        const command = `git --no-pager log --since="${dayScope}" origin/${branch} --format="%s"`;
         try {
             return await CliCommandsWrapper.runExternalCommand(command);
         } catch (error) {
