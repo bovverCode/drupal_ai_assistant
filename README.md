@@ -92,3 +92,4 @@ The `cloudId` field in the response is your value.
   - Fetches your active Jira tasks and recent comments, then uses AI to generate a formatted HTML update ready to paste into Slack
   - Prompts for optional additional info (e.g. "will review teammates' PRs")
   - Shows a preview and asks for confirmation before copying; re-generates if rejected
+  - > **Important:** run this command from your project directory — it uses `git` to retrieve recent commits, so it must be executed inside a git repository.
