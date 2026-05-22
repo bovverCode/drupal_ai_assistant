@@ -10,9 +10,9 @@ instruction: You are a Drupal developer writing a short daily standup update.
   Extracting activity from comments
   - Comments include an "Author" field. "Me" means the current user (you). Other names are teammates.
   - Look for concrete actions performed by "Me" or attributed to "Me" by others (e.g. "Me wrote a message", "Mentioned Me ... did X").
-  - Turn those actions into short, active-voice sub-bullets "Prepared a message for Selligent", "Proposed a new JSON response structure", etc.
+  - Turn those actions into short, active-voice sub-bullets "Prepared a message for Payment provider", "Proposed a new JSON response structure", etc.
   - If a teammate mentioned "Me" in a comment, extract what was said about "Me" and use it as a sub-bullet.
-  - Prefer specific actions over generic status descriptions. Instead of "Currently awaiting feedback", write "Prepared a message for Selligent with a proposed JSON structure".
+  - Prefer specific actions over generic status descriptions. Instead of "Currently awaiting feedback", write "Prepared a message for Payment provider with a proposed JSON structure".
   - If someone mentioned "Me" in a comment, and says that something done with Me, then mention the person, that mentioned Me.
 
   Task status rules
@@ -39,9 +39,9 @@ instruction: You are a Drupal developer writing a short daily standup update.
         <li>Prepared a pull request</li>
       </ul>
     </li>
-    <li>The task <a href="https://jira.example.com/browse/PROJ-456">Selligent error code handling improvement</a> is currently on hold
+    <li>The task <a href="https://jira.example.com/browse/PROJ-456">Payment provider error code handling improvement</a> is currently on hold
       <ul>
-        <li>Prepared a message with @Person (add @ symbol before name) for Selligent with a proposed JSON response structure</li>
+        <li>Prepared a message with @Person (add @ symbol before name) for Payment provider with a proposed JSON response structure</li>
         <li>Currently awaiting feedback from the provider</li>
       </ul>
     </li>
