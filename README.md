@@ -87,7 +87,7 @@ The `cloudId` field in the response is your value.
 
 **`BITBUCKET_EMAIL`** — The email address associated with your Bitbucket account.
 
-**`BITBUCKET_API_TOKEN`** — Generate an App Password at [Bitbucket App Passwords](https://bitbucket.org/account/settings/app-passwords/).
+**`BITBUCKET_API_TOKEN`** — Generate a token at [Atlassian API Tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
 > **Important:** the token must have the **`read:pullrequest:bitbucket` (Pull requests: Read)** scope to work correctly.
 
 **`BITBUCKET_WORKSPACE`** — Your workspace slug, visible in the URL when browsing your workspace:
