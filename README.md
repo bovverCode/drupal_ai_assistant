@@ -68,6 +68,10 @@ cp .env.example .env
 | `JIRA_API_TOKEN` | Your Jira API token |
 | `JIRA_CLOUD_ID` | Your Jira cloud instance ID |
 | `JIRA_SUBDOMAIN` | Your Jira subdomain (e.g. `mycompany` from `mycompany.atlassian.net`) |
+| `BITBUCKET_EMAIL` | Your Bitbucket account email |
+| `BITBUCKET_API_TOKEN` | Your Bitbucket API token |
+| `BITBUCKET_WORKSPACE` | Your Bitbucket workspace slug |
+| `BITBUCKET_REPOSITORY_SLUG` | Your Bitbucket repository slug |
 | `DOTENV_CONFIG_QUIET` | Set to `1` to suppress dotenv loading messages |
 
 **`GEMINI_API_KEY`** — Get a free key at [Google AI Studio](https://aistudio.google.com/app/apikey). Gemini has a generous free tier, no credit card needed.
@@ -80,6 +84,21 @@ cp .env.example .env
 https://<my-site-name>.atlassian.net/_edge/tenant_info
 ```
 The `cloudId` field in the response is your value.
+
+**`BITBUCKET_EMAIL`** — The email address associated with your Bitbucket account.
+
+**`BITBUCKET_API_TOKEN`** — Generate an App Password at [Bitbucket App Passwords](https://bitbucket.org/account/settings/app-passwords/).
+> **Important:** the token must have the **`read:pullrequest:bitbucket` (Pull requests: Read)** scope to work correctly.
+
+**`BITBUCKET_WORKSPACE`** — Your workspace slug, visible in the URL when browsing your workspace:
+```
+https://bitbucket.org/<workspace>/
+```
+
+**`BITBUCKET_REPOSITORY_SLUG`** — Your repository slug, visible in the URL of your repository:
+```
+https://bitbucket.org/<workspace>/<repository-slug>/
+```
 
 ---
 
