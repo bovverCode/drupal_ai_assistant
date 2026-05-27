@@ -105,8 +105,8 @@ https://bitbucket.org/<workspace>/<repository-slug>/
 
 ## Commands
 
-- `druppy chat <message>` — send a message to the AI
-- `druppy service <description>` — create a Drupal service (describe what it should do)
+- `druppy chat "<message>"` — send a message to the AI
+- `druppy service "<description>"` — create a Drupal service (describe what it should do)
   - `-p` — specify the path to the module (default: searches for the closest module directory)
 - `druppy morning` — generate a morning Slack standup update and copy it to clipboard
   - Fetches your active Jira tasks and recent comments, then uses AI to generate a formatted HTML update ready to paste into Slack
