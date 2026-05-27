@@ -1,6 +1,7 @@
 /**
  * Data transfer object for Jira task.
  */
+import { getLatestBusinessDay } from '@/functions.ts';
 
 /**
  * Task status.
@@ -22,6 +23,7 @@ export class JiraTask {
      * @param statusChangedDate - Task status changed date.
      * @param comments - Task comments raw string.
      * @param lastCommits - Task last commits raw string.
+     * @param prCreatedDate - PR created date or null if not created yet.
      */
     constructor(
         readonly name: string,
@@ -31,6 +33,7 @@ export class JiraTask {
         readonly statusChangedDate: Date,
         readonly comments: string,
         readonly lastCommits: string,
+        readonly prCreatedDate: Date | null,
     ) {}
 
     /**
@@ -44,7 +47,27 @@ export class JiraTask {
             `Current task status: ${this.status}\n` +
             `Task status changed at: ${this.getSimplifiedStatusDate()}\n` +
             `Task comments: ${this.comments}\n` +
-            `Latest task commits: ${this.lastCommits}`;
+            `Latest task commits: ${this.lastCommits}\n` +
+            `PR created date: ${this.getSimplifiedPrCreatedDate()}\n`;
+    }
+
+    /**
+     * Check if PR was created last working day.
+     * @returns True if PR was created last working day, false otherwise.
+     */
+    doPrCreatedLastWorkingDay(): boolean {
+        if (!this.prCreatedDate) return false;
+        return this.prCreatedDate.getTime() >= getLatestBusinessDay().getTime();
+    }
+
+    /**
+     * Get simplified PR created date.
+     * @returns Simplified PR created date.
+     * @private
+     */
+    private getSimplifiedPrCreatedDate(): string {
+        if (!this.prCreatedDate) return 'not created yet';
+        return this.doPrCreatedLastWorkingDay() ? 'last working day' : 'few days ago';
     }
 
     /**
@@ -56,7 +79,7 @@ export class JiraTask {
         today.setHours(0, 0, 0, 0);
         const statusDate: Date = new Date(this.statusChangedDate);
         statusDate.setHours(0, 0, 0, 0);
-        return statusDate.getTime() === today.getTime() ? 'today' : 'started few days ago';
+        return statusDate.getTime() === today.getTime() ? 'today' : 'changed one or more days ago';
     }
 
 }

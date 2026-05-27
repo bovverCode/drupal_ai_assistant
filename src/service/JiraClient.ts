@@ -5,6 +5,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { getEnvVar } from '@/functions.ts';
 import { JiraTask, Status as JiraStatus } from '@/dto/JiraTask.ts';
 import { GitClient } from '@/service/GitClient.ts';
+import { BitbucketClient } from '@/service/BitbucketClient.ts';
 
 export class JiraClient {
 
@@ -70,7 +71,20 @@ export class JiraClient {
                 const statusChangedDate: Date = new Date(statusChangedTime);
                 const comments: string | undefined = this.getCommentsFromIssueResponse(issue);
                 const link: string = this.baseTaskLink + branchCode;
-                const task: JiraTask =  new JiraTask(taskName, branchCode, link, status, statusChangedDate, comments, commits);
+                let prCreatedDate: Date | null = null;
+                if (status !== JiraStatus.InProgress) {
+                    prCreatedDate = await BitbucketClient.instance.getPrDateByBranchCode(branchCode);
+                }
+                const task: JiraTask =  new JiraTask(
+                    taskName,
+                    branchCode,
+                    link,
+                    status,
+                    statusChangedDate,
+                    comments,
+                    commits,
+                    prCreatedDate
+                );
                 if (!this.taskIsActual(task)) continue;
                 result.push(task);
             }
@@ -161,16 +175,14 @@ export class JiraClient {
      * @private
      */
     private taskIsActual(task: JiraTask): boolean {
-        // @todo if i've created a PR today, but last commit was yesterday, then it's missing in the update.
-        if (!task.lastCommits && task.status === JiraStatus.Resolved) {
-            // Skip old resolved tasks.
-            return false;
+        const hasCommits = task.lastCommits.length > 0;
+        const hasComments = task.comments.length > 0;
+        switch (task.status) {
+            case JiraStatus.Resolved:
+                return hasCommits || task.doPrCreatedLastWorkingDay();
+            case JiraStatus.OnHold:
+                return hasCommits || hasComments;
         }
-        if (!task.comments && !task.lastCommits && task.status === JiraStatus.OnHold) {
-            // Skip old onHold tasks.
-            return false;
-        }
-
         return true;
     }
 }

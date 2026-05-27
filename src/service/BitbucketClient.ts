@@ -36,21 +36,25 @@ export class BitbucketClient {
     }
 
     /**
-     * Check if a user reviewed yesterday.
-     * @returns - True if user reviewed yesterday, false otherwise.
+     * Get PR created date by branch code.
+     * @param branchCode - Branch code (PROJ-1499).
+     * @returns - PR created date or null if not found.
      */
-    async didUserReviewYesterday(): Promise<boolean> {
+    async getPrDateByBranchCode(branchCode: string): Promise<Date | null> {
         const activityResponse: AxiosResponse = await this.bitbucket.get('/', {
             params: {
-              q: ``
+                q: `title~"${branchCode}:"`,
             }
         });
+        let prCreatedDate: Date | null = null;
+        if (!activityResponse.data.values) return prCreatedDate;
         for (const pr of activityResponse.data.values) {
-            if (pr.approval) {
-                console.log(pr.approval);
-            }
+            if (!pr.created_on) continue;
+            prCreatedDate = new Date(pr.created_on);
+            prCreatedDate.setHours(0, 0, 0, 0);
+            break;
         }
-        return false;
+        return prCreatedDate;
     }
 
 }

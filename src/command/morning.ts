@@ -28,7 +28,7 @@ export function registerCommand(program: Command): void {
         .description('Generate and copy morning Slack update')
         .action(() => {
             copyMorningUpdate()
-                .catch((error) => handleProgramError(program, error))
+                .catch((error) => handleProgramError(program, error));
         });
 }
 
@@ -36,8 +36,6 @@ export function registerCommand(program: Command): void {
  * Generate and copy morning Slack update.
  */
 async function copyMorningUpdate(): Promise<void> {
-    // @todo check BitBucket to add worked on Prs
-    // @todo if pr was created few days ago, but i updated the PR then it should say, that i updated the PR (now it thinks that i finished working on the task)
     const morningUpdate: ClipboardContent = await generateMorningUpdate();
     await CliCommandsWrapper.copyToClipboard(morningUpdate, true);
 }
@@ -48,9 +46,11 @@ async function copyMorningUpdate(): Promise<void> {
  */
 async function generateMorningUpdate(): Promise<ClipboardContent> {
     const additionalInfo: string = await input({ message: 'Please, enter additional info (optional):'});
+    const doPrReviewDone: boolean = await confirm({ message: 'Have you done PR review?', default: false});
+    const willWorkOnPrs: boolean = await confirm({ message: 'Will you work on PRs?', default: false});
     const tasks: JiraTask[] = await JiraClient.instance.getTasks();
     const htmlPromptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'morning_html.yml'));
-    const htmlGeminiMessage: string = getHtmlPromptMessage(tasks, additionalInfo, htmlPromptConfig);
+    const htmlGeminiMessage: string = getHtmlPromptMessage(tasks, additionalInfo, doPrReviewDone, willWorkOnPrs, htmlPromptConfig);
     let htmlResponse: string = await GeminiClient.instance.sendMessage(htmlGeminiMessage, { systemInstruction: htmlPromptConfig.instruction });
     console.log(htmlResponse);
     while (!await confirm({ message: 'Is this morning update correct?'})) {
@@ -77,19 +77,27 @@ async function generateMorningUpdate(): Promise<ClipboardContent> {
  * Get HTML prompt message.
  * @param tasks - Jira tasks.
  * @param additionalInfo - Additional info.
+ * @param doPrReviewDone - Whether PR review is done.
+ * @param willWorkOnPrs - Whether I will work on PRs.
  * @param htmlPromptConfig - HTML prompt config.
  * @throws Error if not enough data to generate morning update.
  */
-function getHtmlPromptMessage(tasks: JiraTask[], additionalInfo: string, htmlPromptConfig: Prompt): string {
+function getHtmlPromptMessage(tasks: JiraTask[], additionalInfo: string, doPrReviewDone: boolean, willWorkOnPrs: boolean, htmlPromptConfig: Prompt): string {
     let tasksMessage: string = '';
     let additionalInfoMessage: string = '';
     if (additionalInfo) {
         additionalInfoMessage = `Additional: ${additionalInfo}`;
     }
+    if (doPrReviewDone) {
+        additionalInfoMessage += '\nReviewed teammates PRs';
+    }
+    if (willWorkOnPrs) {
+        additionalInfoMessage += '\nWill review teammates PRs and update mine';
+    }
     for (const task of tasks) {
         tasksMessage += task.toString() + '\n';
     }
-    if (!tasksMessage && !additionalInfo) {
+    if (!tasksMessage && !additionalInfoMessage) {
         throw new Error('Not enough data to generate morning update.');
     }
 

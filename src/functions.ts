@@ -57,3 +57,23 @@ export function handleProgramError(program: Command, error: unknown): void {
         '💀 ' + (error instanceof Error ? error.message : String(error))
     );
 }
+
+/**
+ * Get the latest business day.
+ * @returns Date object of the latest business day.
+ */
+export function getLatestBusinessDay(): Date {
+    const today: Date = new Date();
+    today.setHours(0, 0, 0, 0);
+    const latestBusinessDay: Date = new Date(today);
+    switch (today.toLocaleDateString('en-US', { weekday: 'long' })) {
+        case 'Monday':
+            latestBusinessDay.setDate(today.getDate() - 3);
+            break;
+        case 'Sunday':
+            latestBusinessDay.setDate(today.getDate() - 2);
+            break;
+        default: latestBusinessDay.setDate(today.getDate() - 1);
+    }
+    return latestBusinessDay;
+}

@@ -1,4 +1,5 @@
 import { CliCommandsWrapper } from '@/service/CliCommandsWrapper.ts';
+import { getLatestBusinessDay } from "@/functions.ts";
 
 /**
  * Wrapper around the Git CLI.
@@ -11,23 +12,12 @@ export class GitClient {
      * @returns Latest commits diff.
      */
     static async getBranchLatestCommits(branch: string): Promise<string> {
-        const today = new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            timeZone: 'Europe/Kyiv'
-        });
-        let dayScope: string;
-        switch (today) {
-            case 'Monday':
-                dayScope = '3 days ago';
-                break;
-            default:
-                dayScope = '1 day ago';
-        }
-        const command = `git --no-pager log --since="${dayScope}" origin/${branch} --format="%s"`;
+        const latestBusinessDayString: string = getLatestBusinessDay().toISOString();
+        const command = `git --no-pager log --since="${latestBusinessDayString}" origin/${branch} --format="%s"`;
         try {
             return await CliCommandsWrapper.runExternalCommand(command);
         } catch (error) {
-            console.warn(`Branch ${branch} commits not found since ${dayScope}.`);
+            console.warn(`Branch ${branch} commits not found since ${latestBusinessDayString}.`);
             return '';
         }
 

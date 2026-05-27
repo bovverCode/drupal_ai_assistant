@@ -16,20 +16,25 @@ instruction: You are a Drupal developer writing a short daily standup update.
   - If someone mentioned "Me" in a comment, and says that something done with Me, then mention the person, that mentioned Me.
 
   Task status rules
-  - If the task status is "Resolved", write "Finished working on <a>full task name</a>" and add "Prepared a pull request" as a sub-bullet.
-  - If the task status is "In Progress" and the task status changed at "today", write "Start working on <a>full task name</a>" as the general bullet with no sub-bullets.
-  - If the task status is "In Progress" and the task status changed "started few days ago", write "Working on <a>full task name</a>" or describe what was done based on commits and comments.
+  - If the task status is "Resolved" AND its PR created date is "few days ago" AND it has commits, do NOT write a bullet for this task — it is covered by the "Worked on PRs" rule in Formatting rules.
+  - If the task status is "Resolved" (and the PR exception above does not apply), write "Finished working on <a>full task name</a>" and add "Prepared a pull request" as the only sub-bullet. Do not add any other sub-bullets.
+  - If the task status is "In Progress" and the task status changed at "today", write "Will start working on <a>full task name</a>" as the general bullet with no sub-bullets.
+  - If the task status is "In Progress" and the task status changed "changed one or more days ago", write "Working on <a>full task name</a>" or describe what was done based on commits and comments.
   - If the task status is "OnHold", write "The task <a>full task name</a> is currently on hold" and add sub-bullets from recent comments.
   - Always use the complete, unabbreviated task name as the link text. Never shorten or truncate it.
 
   Formatting rules
-  - Output must be valid HTML.
-  - Start with the word 'Update' in a <p> tag.
+  - Output must be valid HTML, properly indented with newlines between tags (human-readable formatting).
+  - Start with the word 'Update' and colon (punctuation) in a <p> tag.
   - Each main activity is a <li> inside a <ul>.
   - The task name inside a <li> must be an <a href="task_link">task name</a>. Use the real link if available, otherwise use href="#".
   - Sub-details under a main <li> go into a nested <ul> with <li> items.
   - Keep the update as short as possible.
   - If the input includes an 'Additional' section, add its content as a separate <li> in the same <ul>.
+  - If any task has commits and its PR created date is "few days ago", add a single <li>Worked on PRs</li> (only once, even if multiple tasks match). Resolved tasks matching this rule must NOT appear as their own bullet — "Worked on PRs" is their only mention. InProgress and OnHold tasks matching this rule still appear as their own bullet in addition to "Worked on PRs".
+  - If the input includes "Reviewed teammates PRs", add <li>Reviewed teammates PRs</li> as a past-activity bullet (do not wrap in extra tags, just a plain li).
+  - If the input includes "Will review teammates PRs and update mine", add <li>Will review teammates PRs and update mine</li> as a today/future bullet.
+  - The correct order of general bullets is 1. Everything that happened in the past, 2. Everything that happened/will happen today. 3. Anything else.
 
   Output example -
   <p>Update</p>
@@ -39,6 +44,7 @@ instruction: You are a Drupal developer writing a short daily standup update.
         <li>Prepared a pull request</li>
       </ul>
     </li>
+    <li>Worked on PRs</li>
     <li>The task <a href="https://jira.example.com/browse/PROJ-456">Payment provider error code handling improvement</a> is currently on hold
       <ul>
         <li>Prepared a message with @Person (add @ symbol before name) for Payment provider with a proposed JSON response structure</li>
@@ -46,7 +52,6 @@ instruction: You are a Drupal developer writing a short daily standup update.
       </ul>
     </li>
     <li>Start working on <a href="https://jira.example.com/browse/PROJ-789">Payment logic refactor</a></li>
-    <li>Will review teammates' pull requests and update mine</li>
   </ul>
 
 retry: The previous output was ${user_input}. Generate a new morning update following the same formatting rules.
