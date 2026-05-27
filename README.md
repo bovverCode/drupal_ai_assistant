@@ -4,16 +4,17 @@
 - [x] Do standalone cli application
 - [X] Question - answer (AI)
 - [x] Create a service in the closest module by name
-- [x] Writing update (analyze yesterday work) commits by my name, ask additional info (use pattern)
+- [x] Writing update (analyze yesterday work) commits by my name, ask additional info (use a pattern)
 - [ ] Analysis of changes in the current branch or specified one
 - [ ] Analysis of the module
 - [ ] Generate a .po file content by branch diff, check for duplicates
-- [ ] Do PR review (compare the branch with the master)
+- [ ] Do PR review
 - [ ] Analysis of a new task and recommendations
 - [ ] Add files to gitignore (.git directory)
 - [ ] Find module/file related to some phrase, file name etc
 - [ ] Do Drupal update script, send a message to the AI in case of error
 - [ ] Do git commit and push feature (get branch, do commit and push by pattern)
+- [ ] Do git rebase and push feature
 - [ ] Create a new branch from live using JIRA API, do update script (start a new task)
 
 ### Additional:
