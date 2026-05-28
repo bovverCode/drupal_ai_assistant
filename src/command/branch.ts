@@ -3,6 +3,7 @@
  */
 import { Command } from 'commander';
 import { handleProgramError } from '@/functions.ts';
+import { GitClient } from '@/service/GitClient.ts';
 
 /**
  * Register the `branch` command.
@@ -14,5 +15,18 @@ export function registerCommand(program: Command): void {
         .command('branch')
         .description('Analyze branch code changes')
         .argument('[branch_code]', 'Branch code (PROJ-991)', null)
-        .action((branchCode: string | null) => {console.log(branchCode);});
+        .action((branchCode: string | null) => {
+            analyzeBranchCode(branchCode)
+                .catch((error) => handleProgramError(program, error));
+        });
+}
+
+/**
+ * Analyze branch code changes and output the result.
+ * @param branchCode - Branch code (PROJ-991) or null.
+ */
+async function analyzeBranchCode(branchCode: string | null): Promise<void> {
+    if (!branchCode) {
+        branchCode = await GitClient.getCurrentBranchName();
+    }
 }

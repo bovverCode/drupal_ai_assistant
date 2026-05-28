@@ -23,4 +23,12 @@ export class GitClient {
 
     }
 
+    /**
+     * Get the current branch name.
+     * @returns Current branch name.
+     */
+    static async getCurrentBranchName(): Promise<string> {
+        return (await CliCommandsWrapper.runExternalCommand('git branch --show-current')).trim();
+    }
+
 }
