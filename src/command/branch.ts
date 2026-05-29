@@ -29,4 +29,8 @@ async function analyzeBranchCode(branchCode: string | null): Promise<void> {
     if (!branchCode) {
         branchCode = await GitClient.getCurrentBranchName();
     }
+    const changedFiles: string[] = await GitClient.getBranchChangedFiles(branchCode);
+    if (changedFiles.length === 0) {
+        throw new Error('No files changed in the branch');
+    }
 }

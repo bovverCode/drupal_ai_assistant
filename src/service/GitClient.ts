@@ -1,5 +1,5 @@
 import { CliCommandsWrapper } from '@/service/CliCommandsWrapper.ts';
-import { getLatestBusinessDay } from "@/functions.ts";
+import { getEnvVar, getLatestBusinessDay } from '@/functions.ts';
 
 /**
  * Wrapper around the Git CLI.
@@ -29,6 +29,16 @@ export class GitClient {
      */
     static async getCurrentBranchName(): Promise<string> {
         return (await CliCommandsWrapper.runExternalCommand('git branch --show-current')).trim();
+    }
+
+    /**
+     * Get the list of files changed in a branch.
+     * @param branch - Branch name.
+     * @returns List of files changed in the branch.
+     */
+    static async getBranchChangedFiles(branch: string): Promise<string[]> {
+        const prodBranch: string = getEnvVar('PRODUCTION_BRANCH');
+        return (await CliCommandsWrapper.runExternalCommand(`git diff --name-only origin/${branch} origin/${prodBranch}`)).trim().split('\n');
     }
 
 }
