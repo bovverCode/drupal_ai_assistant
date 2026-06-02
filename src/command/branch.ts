@@ -4,6 +4,8 @@
 import { Command } from 'commander';
 import { handleProgramError } from '@/functions.ts';
 import { GitClient } from '@/service/GitClient.ts';
+import { ChangedFile } from "@/type/ChangedFile.ts";
+import { FileSystemWrapper } from '@/service/FileSystemWrapper.ts';
 
 /**
  * Register the `branch` command.
@@ -29,8 +31,26 @@ async function analyzeBranchCode(branchCode: string | null): Promise<void> {
     if (!branchCode) {
         branchCode = await GitClient.getCurrentBranchName();
     }
+    const files: ChangedFile[] = await getFileObjects(branchCode);
+}
+
+/**
+ * Get file objects for the given branch code.
+ * @param branchCode - Branch code (PROJ-991).
+ * @returns Array of file objects.
+ */
+async function getFileObjects(branchCode: string): Promise<ChangedFile[]> {
     const changedFiles: string[] = await GitClient.getBranchChangedFiles(branchCode);
     if (changedFiles.length === 0) {
-        throw new Error('No files changed in the branch');
+        // @todo what to do if changes are already deployed?
+        throw new Error('No files changed in the branch.');
     }
+
+    return Promise.all(changedFiles.map(async (changedFilePath) => {
+        return {
+            absolutePath: changedFilePath,
+            allCode: await FileSystemWrapper.readFile(changedFilePath),
+            diff: await GitClient.getFileDiff(changedFilePath, branchCode)
+        }
+    }))
 }

@@ -38,7 +38,22 @@ export class GitClient {
      */
     static async getBranchChangedFiles(branch: string): Promise<string[]> {
         const prodBranch: string = getEnvVar('PRODUCTION_BRANCH');
-        return (await CliCommandsWrapper.runExternalCommand(`git diff --name-only origin/${branch} origin/${prodBranch}`)).trim().split('\n');
+        const rootPath: string = (await CliCommandsWrapper.runExternalCommand('git rev-parse --show-toplevel')).trim();
+        const diffResult: string = (await CliCommandsWrapper.runExternalCommand(`git diff --name-only origin/${branch} origin/${prodBranch}`)).trim();
+        if (!diffResult) return [];
+        const relativeFilePaths: string[] = diffResult.split('\n')
+        return relativeFilePaths.map(relativePath => `${rootPath}/${relativePath}`);
+    }
+
+    /**
+     * Get the diff of a file.
+     * @param filePath - File path.
+     * @param branch - Branch code (PROJ-991).
+     * @returns Diff of the file.
+     */
+    static async getFileDiff(filePath: string, branch: string): Promise<string> {
+        const prodBranch: string = getEnvVar('PRODUCTION_BRANCH');
+        return (await CliCommandsWrapper.runExternalCommand(`git diff origin/${prodBranch} origin/${branch} -- "${filePath}"`)).trim();
     }
 
 }
