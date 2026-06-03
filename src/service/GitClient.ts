@@ -37,11 +37,13 @@ export class GitClient {
      * @returns List of files changed in the branch.
      */
     static async getBranchChangedFiles(branch: string): Promise<string[]> {
-        const prodBranch: string = getEnvVar('PRODUCTION_BRANCH');
+        if (!branch) branch = await this.getCurrentBranchName();
         const rootPath: string = (await CliCommandsWrapper.runExternalCommand('git rev-parse --show-toplevel')).trim();
-        const diffResult: string = (await CliCommandsWrapper.runExternalCommand(`git diff --name-only origin/${branch} origin/${prodBranch}`)).trim();
-        if (!diffResult) return [];
-        const relativeFilePaths: string[] = diffResult.split('\n')
+        const changedFiles: string =
+            (await CliCommandsWrapper.runExternalCommand(`git log --all --name-only --format="" --grep="${branch}"`))
+            .trim();
+        if (!changedFiles) return [];
+        const relativeFilePaths: string[] = changedFiles.split('\n')
         return relativeFilePaths.map(relativePath => `${rootPath}/${relativePath}`);
     }
 
@@ -53,6 +55,7 @@ export class GitClient {
      */
     static async getFileDiff(filePath: string, branch: string): Promise<string> {
         const prodBranch: string = getEnvVar('PRODUCTION_BRANCH');
+        // @todo replaced command to support merged branches.
         return (await CliCommandsWrapper.runExternalCommand(`git diff origin/${prodBranch} origin/${branch} -- "${filePath}"`)).trim();
     }
 
