@@ -55,8 +55,21 @@ export class GitClient {
      */
     static async getFileDiff(filePath: string, branch: string): Promise<string> {
         const prodBranch: string = getEnvVar('PRODUCTION_BRANCH');
-        // @todo replaced command to support merged branches.
-        return (await CliCommandsWrapper.runExternalCommand(`git diff origin/${prodBranch} origin/${branch} -- "${filePath}"`)).trim();
+        let fileDiff: string = (await CliCommandsWrapper.runExternalCommand(`git diff origin/${prodBranch} origin/${branch} -- "${filePath}"`)).trim();
+        if (fileDiff) {
+            return fileDiff;
+        }
+
+        // Branch is probably merged to production.
+        // Here we try to get the diff from the last commit.
+        const commits: string[] = (await CliCommandsWrapper.runExternalCommand(`git log --all --grep="${branch}" --format="%H" --reverse`))
+            .trim()
+            .split('\n');
+        if (commits.length < 2) {
+            throw new Error(`No commits found for the branch ${branch}`);
+        }
+        fileDiff = (await CliCommandsWrapper.runExternalCommand(`git diff ${commits[0]}^ ${commits[1]} -- "${filePath}"`)).trim();
+        return fileDiff;
     }
 
 }

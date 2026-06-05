@@ -32,6 +32,8 @@ async function analyzeBranchCode(branchCode: string | null): Promise<void> {
         branchCode = await GitClient.getCurrentBranchName();
     }
     const files: ChangedFile[] = await getFileObjects(branchCode);
+    // @todo gather task description from JIRA
+    // @todo send info to Gemini API
 }
 
 /**
