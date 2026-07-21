@@ -38,7 +38,7 @@ export class BitbucketClient {
     /**
      * Get PR created date by branch code.
      * @param branchCode - Branch code (PROJ-1499).
-     * @returns - PR created date or null if not found.
+     * @returns PR created date or null if not found.
      */
     async getPrDateByBranchCode(branchCode: string): Promise<Date | null> {
         const activityResponse: AxiosResponse = await this.bitbucket.get('/', {

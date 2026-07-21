@@ -44,11 +44,29 @@ export class JiraClient {
     }
 
     /**
+     * Get task description by task code.
+     * @param taskCode - Task code.
+     * @returns Task description.
+     */
+    async getTaskDescription(taskCode: string): Promise<string> {
+        let result: string = '';
+        try {
+            const response: AxiosResponse = await this.jira.get('issue/' + taskCode, {
+               params: {
+                   fields: ['description']
+               }
+            });
+            result = this.getTextContent(response.data.fields.description.content);
+        } catch {}
+        return result.trim();
+    }
+
+    /**
      * Get active tasks assigned to the current user.
-     * @returns - Array of Jira tasks.
+     * @returns Array of Jira tasks.
      * @throws Error if something goes wrong.
      */
-    async getTasks(): Promise<JiraTask[]> {
+    async getActiveTasks(): Promise<JiraTask[]> {
         let result: JiraTask[] = [];
         try {
             const response: AxiosResponse = await this.jira.get('search/jql', {
@@ -98,7 +116,7 @@ export class JiraClient {
     /**
      * Get comments from the issue response.
      * @param issueResponse - Issue response object from the Jira API.
-     * @returns - String containing the comments.
+     * @returns String containing the comments.
      * @private
      */
     private getCommentsFromIssueResponse(issueResponse: any): string {
@@ -115,7 +133,7 @@ export class JiraClient {
             }
             const author: string = comment.author.displayName === myName ? 'Me' : comment.author.displayName;
             result += `Author: ${author}\n`;
-            result += this.getCommentItemContent(comment.body.content, myName);
+            result += this.getTextContent(comment.body.content, myName);
             result += '\n';
         }
         if (!result) {
@@ -128,14 +146,14 @@ export class JiraClient {
      * Get comment item content.
      * @param contentItems - Array of comment items.
      * @param myName - My Jira name.
-     * @returns - String containing the comment item content.
+     * @returns String containing the comment item content.
      * @private
      */
-    private getCommentItemContent(contentItems: any, myName: string): string {
+    private getTextContent(contentItems: any, myName: string = ''): string {
         let result = '';
         for (const contentItem of contentItems) {
             if (contentItem.content) {
-                const commentItemContent = this.getCommentItemContent(contentItem.content, myName);
+                const commentItemContent = this.getTextContent(contentItem.content, myName);
                 result += commentItemContent;
                 if (contentItem.type === 'paragraph') {
                     result += '\n';
@@ -153,7 +171,7 @@ export class JiraClient {
      * Get item content by type.
      * @param contentItem - Content item object.
      * @param myName - My Jira name.
-     * @returns - String containing the item content.
+     * @returns String containing the item content.
      * @private
      */
     private getItemContentByType(contentItem: any, myName: string): string {

@@ -48,7 +48,7 @@ async function generateMorningUpdate(): Promise<ClipboardContent> {
     const additionalInfo: string = await input({ message: 'Please, enter additional info (optional):'});
     const doPrReviewDone: boolean = await confirm({ message: 'Have you done PR review?', default: false});
     const willWorkOnPrs: boolean = await confirm({ message: 'Will you work on PRs?', default: false});
-    const tasks: JiraTask[] = await JiraClient.instance.getTasks();
+    const tasks: JiraTask[] = await JiraClient.instance.getActiveTasks();
     const htmlPromptConfig: Prompt = await getPromptConfig(path.join(promptFolderPath, 'morning_html.yml'));
     const htmlGeminiMessage: string = getHtmlPromptMessage(tasks, additionalInfo, doPrReviewDone, willWorkOnPrs, htmlPromptConfig);
     let htmlResponse: string = await GeminiClient.instance.sendMessage(htmlGeminiMessage, { systemInstruction: htmlPromptConfig.instruction });
